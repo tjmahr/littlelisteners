@@ -1,0 +1,11 @@
+Package: littlelisteners
+Title: Helper Functions for Hand-coded Eyetracking Data
+Version: 0.0.0.9000
+Authors@R: person("Tristan", "Mahr", email = "tristan.mahr@wisc.edu", role = c("aut", "cre"))
+Description: This package houses frequently used functions for working with
+    hand-coded eyetracking data.
+Depends:
+    R (>= 3.2.3)
+License: MIT + file LICENSE
+LazyData: true
+RoxygenNote: 5.0.1
