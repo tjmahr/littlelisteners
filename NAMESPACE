@@ -3,3 +3,6 @@
 export(empirical_logit)
 export(empirical_logit_weight)
 export(interpolate_looks)
+export(read_gazedata)
+import(dplyr)
+importFrom(tools,file_path_sans_ext)
