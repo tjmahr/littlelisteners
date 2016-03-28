@@ -8,8 +8,10 @@ interpolate_looks(x, window, fps, response_col, interp_col, fillable,
   missing_looks)
 }
 \arguments{
-\item{x}{a dataframe of eyetracking data for a single trial. Each row should
-be a single frame of eyetracking.}
+\item{x}{a dataframe of grouped eyetracking data. Each row should be a single
+frame of eyetracking. Use \code{dplyr::group_by()} to set the grouping
+columns for the data. The groups should specify a single trial of
+eyetracking data.}
 
 \item{window}{maximum amount of missing data (milliseconds) that can be
 interpolated. Only spans of missing data with less than or equal to this

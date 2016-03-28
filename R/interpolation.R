@@ -5,8 +5,10 @@
 #'   `"Target", NA, NA, "Target"` would be interpolated to be `"Target",
 #'   "Target", "Target", "Target"`.
 #'
-#' @param x a dataframe of eyetracking data for a single trial. Each row should
-#'   be a single frame of eyetracking.
+#' @param x a dataframe of grouped eyetracking data. Each row should be a single
+#'   frame of eyetracking. Use \code{dplyr::group_by()} to set the grouping
+#'   columns for the data. The groups should specify a single trial of
+#'   eyetracking data.
 #' @param window maximum amount of missing data (milliseconds) that can be
 #'   interpolated. Only spans of missing data with less than or equal to this
 #'   duration will be interpolated
@@ -24,6 +26,31 @@
 #'   amount of time.
 #' @export
 interpolate_looks <- function(x, window, fps, response_col, interp_col,
+                                  fillable, missing_looks) {
+  if (!inherits(x, "grouped_df")) {
+    stop("Please use group_by to set grouping columns.\n",
+         "  Grouping variables should select a single eyetracking trial.")
+  }
+
+   do_(x, ~interpolate_looks_one(
+    x = .,
+    window = window,
+    fps = fps,
+    response_col = response_col,
+    interp_col = interp_col,
+    fillable = fillable,
+    missing_looks = missing_looks))
+}
+
+
+
+
+
+
+
+
+
+interpolate_looks_one <- function(x, window, fps, response_col, interp_col,
                               fillable, missing_looks) {
   is_missing_look <- function(xs) xs %in% missing_looks
   trial <- x

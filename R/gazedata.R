@@ -140,8 +140,8 @@ read_gazedata <- function(gazedata_path, eyes = "both", means_need_both = FALSE,
     distances <- c("ZLeft", "ZRight", "DiameterLeft", "DiameterRight")
 
     gazedata <- gazedata %>%
-      mutate_each(funs(correct_offscreen_gazes), one_of(screen_cols)) %>%
-      mutate_each(funs(correct_distances), one_of(distances)) %>%
+      mutate_each_(funs(correct_offscreen_gazes), ~ one_of(screen_cols)) %>%
+      mutate_each_(funs(correct_distances), ~ one_of(distances)) %>%
       # Flip the y values.
       mutate_(YLeft = ~ 1 - YLeft, YRight = ~ 1 - YRight,
               Origin = ~ "LowerLeft")
