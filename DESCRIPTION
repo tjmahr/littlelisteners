@@ -10,4 +10,5 @@ License: MIT + file LICENSE
 LazyData: true
 RoxygenNote: 5.0.1
 Imports: dplyr,
-    ggplot2
+    ggplot2,
+    readr
