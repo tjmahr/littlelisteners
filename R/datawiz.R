@@ -99,3 +99,60 @@ str_reject <- function(string, pattern) {
   string[!stringr::str_detect(string, pattern)]
 }
 
+
+#' Convert DataWiz data into long format
+#'
+#' DataWiz files have several columns F0, F33, F67, etc. for each time sample.
+#' This function converts a dataframe from such a file into a long format, where
+#' there is a single time column and single column of gaze responses.
+#'
+#' @param df a dataframe created by reading a datawiz file
+#' @param key_col the name of the new column that holds the time values
+#' @param value_col the name of the new column that holds the looking data at
+#'   each time sample
+#' @return a long data-frame
+#' @export
+melt_datawiz <- function(df, key_col = "Time", value_col = "Look") {
+  # Assuming X[Numbers] and F[Numbers] are the time columns
+  time_cols <- stringr::str_subset(colnames(df), "^[XF]\\d+$")
+
+  df %>%
+    gather_(key_col = key_col, value_col = value_col, gather_cols = time_cols,
+            na.rm = FALSE, convert = FALSE, factor_key = FALSE) %>%
+    mutate_(Time = ~ as_time(Time))
+}
+
+as_time <- function(xs) {
+  xs %>%
+    stringr::str_replace("^X", "-") %>%
+    stringr::str_replace("^F", "+") %>%
+    as.numeric
+}
+
+
+#' Convert to DataWiz codes to AOI names
+#'
+#' @param xs a vector of DataWiz codes (-, ., 0, 1)
+#' @return the vector with NA for "-", "Target" for "1", "Distractor" for "0", and
+#'   "tracked" for ".".
+#' @export
+convert_datawiz_code_to_aoi <- function(xs) {
+  xs <- xs %>%
+    stringr::str_replace("[-]", "NA") %>%
+    stringr::str_replace("1", "Target") %>%
+    stringr::str_replace("0", "Distractor") %>%
+    stringr::str_replace("[.]", "tracked")
+  xs[xs == "NA"] <- NA
+  xs
+}
+
+as_word <- function(xs) {
+  xs <- xs %>%
+    str_replace("[-]", "dash") %>%
+    str_replace("1", "Target") %>%
+    str_replace("0", "Distractor") %>%
+    str_replace("[.]", "dot")
+  xs[xs == "NA"] <- NA
+  xs
+}
+

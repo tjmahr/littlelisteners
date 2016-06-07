@@ -3,7 +3,7 @@
 #' @importFrom tools file_path_sans_ext
 NULL
 
-require("dplyr")
+# require("dplyr")
 # require("lazyeval")
 
 
