@@ -117,8 +117,9 @@ melt_datawiz <- function(df, key_col = "Time", value_col = "Look") {
   time_cols <- stringr::str_subset(colnames(df), "^[XF]\\d+$")
 
   df %>%
-    gather_(key_col = key_col, value_col = value_col, gather_cols = time_cols,
-            na.rm = FALSE, convert = FALSE, factor_key = FALSE) %>%
+    tidyr::gather_(key_col = key_col, value_col = value_col,
+                   gather_cols = time_cols, na.rm = FALSE, convert = FALSE,
+                   factor_key = FALSE) %>%
     mutate_(Time = ~ as_time(Time))
 }
 
@@ -148,10 +149,10 @@ convert_datawiz_code_to_aoi <- function(xs) {
 
 as_word <- function(xs) {
   xs <- xs %>%
-    str_replace("[-]", "dash") %>%
-    str_replace("1", "Target") %>%
-    str_replace("0", "Distractor") %>%
-    str_replace("[.]", "dot")
+    stringr::str_replace("[-]", "dash") %>%
+    stringr::str_replace("1", "Target") %>%
+    stringr::str_replace("0", "Distractor") %>%
+    stringr::str_replace("[.]", "dot")
   xs[xs == "NA"] <- NA
   xs
 }

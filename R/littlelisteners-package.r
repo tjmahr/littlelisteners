@@ -2,5 +2,5 @@
 #'
 #' @name littlelisteners
 #' @docType package
-#' @import dplyr stringr
+#' @import dplyr
 NULL
