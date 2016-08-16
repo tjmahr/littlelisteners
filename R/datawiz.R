@@ -17,7 +17,7 @@
 #' column "F0". These are also looking samples before "F0". This function
 #' back-fills the column names so that the first column before "F0" changes from
 #' " " to "X33", where the X indicates a negative time sample.
-read_datawiz <- function(filename, sampling_rate = 33.3) {
+read_datawiz <- function(filename, sampling_rate = 33.3333) {
   # Datawiz files are tab-separated files containing several tables concatenated
   # together, so there are multiple rows with the column names:
 
@@ -40,8 +40,6 @@ read_datawiz <- function(filename, sampling_rate = 33.3) {
 
   # Break up tab-delimited tokens in first line to get column names
   raw_first_line_tokens <- readr::read_lines(filename, n_max = 1) %>%
-    # Ignore final tab if there is one
-    stringr::str_replace("\t$", "") %>%
     stringr::str_split("\t") %>%
     unlist
 
@@ -52,6 +50,12 @@ read_datawiz <- function(filename, sampling_rate = 33.3) {
   new_times <- backfill_column_names(blank_cols, "X", sampling_rate)
   new_first_line_tokens <- raw_first_line_tokens
   new_first_line_tokens[blank_cols] <- new_times
+
+  # Create new columns for the blanks at the end of the file
+  first_col <- which(raw_first_line_tokens == "F33")
+  positive_cols <- seq(first_col, length(raw_first_line_tokens))
+  positive_times <- fill_column_names(positive_cols, "F", sampling_rate, offset = 0)
+  new_first_line_tokens[positive_cols] <- positive_times
 
   # Assemble desired header line
   first_line <- paste0(new_first_line_tokens, collapse = "\t")
@@ -86,12 +90,16 @@ read_datawiz <- function(filename, sampling_rate = 33.3) {
     col_types = col_types)
 }
 
+fill_column_names <- function(cols, col_prefix, increment, offset = 0, rounding = 0) {
+  times <- (seq_along(cols) * increment) + offset
+  time_values <- round(times, rounding)
+  col_names <- sprintf("%s%s", col_prefix, time_values)
+  col_names
+}
+
 
 backfill_column_names <- function(cols, col_prefix, increment, rounding = 0) {
-  times <- seq_along(cols) * increment
-  time_values <- rev(round(times, rounding))
-  col_names <- paste0(col_prefix, time_values)
-  col_names
+  rev(fill_column_names(cols, col_prefix, increment, rounding, offset = 0))
 }
 
 
