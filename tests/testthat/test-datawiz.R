@@ -21,7 +21,7 @@ test_that("Reading a simple DataWiz file", {
   df <- read_datawiz(testthat::test_path("data/data_wiz_mock.txt"))
 
   # Outputted dataframe does not have any blank column names
-  expected_names <- c("Header1", "Header2", "Header3", "X166", "X133", "X100",
+  expected_names <- c("Header1", "Header2", "Header3", "X167", "X133", "X100",
                       "X67", "X33", "F0", "F33", "F67")
   expect_equal(names(df), expected_names)
 
@@ -29,6 +29,6 @@ test_that("Reading a simple DataWiz file", {
   expect_true(all(df$Header1 %in% c("KidA", "KidB")))
 
   # Make sure that c(".", "-", "1", "0") are not coerced to numerics
-  expect_type(df$X166, "character")
+  expect_type(df$X167, "character")
 
 })
