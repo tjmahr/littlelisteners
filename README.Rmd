@@ -25,13 +25,128 @@ devtools::install_github("tjmahr/littlelisteners")
 ```
 
 
-## implemented functions
+## overview
 
-Functions are being added as needed. As a first step, I've migrated
-`empirical_logit` functions from [lookr](https://github.com/tjmahr/lookr).
+```{r, warning = FALSE,  message = FALSE}
+library(dplyr)
+library(littlelisteners)
+```
+
+
+```{r, echo = FALSE}
+response_def <- list(
+  primary = "Target",
+  others = "Distractor",
+  elsewhere = "tracked",
+  missing = NA
+)
+
+design <- tidyr::nesting(
+  TrialNo = 1:10, 
+  TargetImage = sample(c("ImageL", "ImageR"), 10, replace = TRUE), 
+  Condition = sample(c("A", "B", "C"), 10, replace = TRUE))
+
+subject <- tibble::data_frame(
+  Subject = c("S01", "S02", "S03", "S04"),
+  PTarget = runif(4, min = .3, max = .7),
+  PElse = runif(4, min = .025, max = .125),
+  PDist = runif(4, min = (1 - PTarget - PElse) / 2, max = .95 * (1 - PTarget - PElse)),
+  PNA = 1 - PTarget - PElse - PDist)
+
+frames <- tidyr::crossing(
+  subject,
+  design, 
+  Time = -20:20 * 50)
+
+frames <- frames %>% 
+  rowwise %>% 
+  mutate(GazeByTarget = sample(x = unlist(response_def), 1, prob = c(PTarget, PDist, PDist, PNA))) %>% 
+  ungroup %>% 
+  select(-PTarget, -PElse, -PDist, -PNA)
+
+frames$DistractorImage <- ifelse(frames$TargetImage == "ImageL", "ImageR", "ImageL")
+frames$GazeByLocation <- frames$GazeByTarget
+frames$GazeByLocation <- ifelse(frames$GazeByTarget %in% "Target", frames$TargetImage, frames$GazeByLocation)
+frames$GazeByLocation <- ifelse(frames$GazeByTarget %in% "Distractor", frames$DistractorImage, frames$GazeByLocation)
+
+two_image_data <- frames %>% select(-DistractorImage)
+```
+
+### eyetracking data
+
+Here's some made-up data for a hypothetical two-image eyetracking experiment.
 
 ```{r}
-library("littlelisteners")
+two_image_data
+```
+
+Gazes are coded in the `GazeByTarget` column as looks to the `"Target"` or 
+`"Distractor"` image with other looks coded as `"tracked"`
+(ambiguous/intermediate location) or `NA` (offscreen or missing). 
+
+
+### response definitions
+
+To deal with eyetracking data in a generic way, we need a way to describe
+eyetracking responses. We assume that there are four basic gaze types.
+
+* Primary responses: A gaze to a primary or target image.
+* Others: A gaze to a competing image.
+* Elsewhere: A gaze that is onscreen but not a primary or other response.
+  Typically, this occurs when the participant is shifting between images.
+* Missing: A missing or offscreen gaze.
+
+A _response definition_ is a programmatic way of mapping gaze codes to these
+response categories. In the code below, `response_def` is a response definition
+for a two-image experiment with a `"Target"` image and `"Distractor"` and other
+looks are either `"tracked"` or missing (`NA`).
+
+```{r}
+response_def <- list(
+  primary = "Target",
+  others = "Distractor",
+  elsewhere = "tracked",
+  missing = NA
+)
+```
+
+### `aggregate_looks`
+
+These response definitions allow us to aggregate looking data in a generic way.
+The function `aggregate_looks` counts the number of looks to each of the four
+response categories using an aggregation formula. For example, we can count looks by participant.
+
+```{r}
+aggregate_looks(two_image_data, response_def, Subject ~ GazeByTarget)
+```
+
+Or looks by participant x condition:
+
+```{r}
+aggregate_looks(two_image_data, response_def, Subject + Condition ~ GazeByTarget)
+```
+
+We can also perform other kind of aggregations using different response
+definitions. For instance, we can compare left vs right images by writing a new
+response definition.
+
+```{r}
+location_def <- list(
+  primary = "ImageR",
+  others = "ImageL",
+  elsewhere = "tracked",
+  missing = NA
+)
+
+aggregate_looks(two_image_data, location_def, Subject ~ GazeByLocation)
+```
+
+
+### others
+
+I've also migrated `empirical_logit` functions from [lookr](https://github.com/tjmahr/lookr).
+
+```{r}
 n_to_target <- c(10, 0, 1, 0)
 n_to_distractor <- c(0, 1, 0, 0)
 
@@ -47,4 +162,3 @@ empirical_logit(n_to_target, n_to_distractor)
 # weighting function
 empirical_logit_weight(n_to_target, n_to_distractor)
 ```
-

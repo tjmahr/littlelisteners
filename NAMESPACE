@@ -2,6 +2,8 @@
 
 export(add_aois)
 export(adjust_times_around_zero)
+export(aggregate_looks)
+export(aggregate_looks_)
 export(convert_datawiz_code_to_aoi)
 export(create_aoi)
 export(empirical_logit)
