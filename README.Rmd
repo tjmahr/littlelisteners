@@ -70,6 +70,29 @@ frames$GazeByLocation <- ifelse(frames$GazeByTarget %in% "Target", frames$Target
 frames$GazeByLocation <- ifelse(frames$GazeByTarget %in% "Distractor", frames$DistractorImage, frames$GazeByLocation)
 
 two_image_data <- frames %>% select(-DistractorImage)
+
+four_image_def <- list(
+  primary = c("Target"),
+  others = c("FoilA", "FoilB", "Competitor"),
+  elsewhere = c("tracked"),
+  missing = c(NA)
+)
+
+four_image_design <- tidyr::nesting(
+  TrialNo = 1:10, 
+  TargetImage = sample(c("UpperLeft", "UpperRight", "LowerLeft", "LowerRight"), 10, replace = TRUE), 
+  Condition = sample(c("A", "B"), 10, replace = TRUE))
+
+four_image_data <- tidyr::crossing(
+  Subject = c("S01", "S02", "S03", "S04"),
+  four_image_design, 
+  Time = -20:20 * 50)
+
+four_image_data$GazeByTarget <- sample(
+  x = unlist(four_image_def),
+  size = nrow(four_image_data),
+  replace = TRUE,
+  prob = c(.35, .05, .075, .175, .05, .15))
 ```
 
 ### eyetracking data
@@ -83,7 +106,6 @@ two_image_data
 Gazes are coded in the `GazeByTarget` column as looks to the `"Target"` or 
 `"Distractor"` image with other looks coded as `"tracked"`
 (ambiguous/intermediate location) or `NA` (offscreen or missing). 
-
 
 ### response definitions
 
@@ -141,6 +163,20 @@ location_def <- list(
 aggregate_looks(two_image_data, location_def, Subject ~ GazeByLocation)
 ```
 
+Or we can handle data from a hypothetical four-image experiment.
+
+```{r}
+four_image_data
+
+four_image_def <- list(
+  primary = c("Target"),
+  others = c("FoilA", "FoilB", "Competitor"),
+  elsewhere = c("tracked"),
+  missing = c(NA)
+)
+
+aggregate_looks(four_image_data, four_image_def, Subject ~ GazeByTarget)
+```
 
 ### others
 

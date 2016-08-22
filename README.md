@@ -30,16 +30,16 @@ two_image_data
 #> # A tibble: 1,640 x 7
 #>    Subject TrialNo TargetImage Condition  Time GazeByTarget GazeByLocation
 #>      <chr>   <int>       <chr>     <chr> <dbl>        <chr>          <chr>
-#> 1      S01       1      ImageL         C -1000       Target         ImageL
-#> 2      S01       1      ImageL         C  -950   Distractor         ImageR
-#> 3      S01       1      ImageL         C  -900       Target         ImageL
-#> 4      S01       1      ImageL         C  -850       Target         ImageL
-#> 5      S01       1      ImageL         C  -800         <NA>           <NA>
-#> 6      S01       1      ImageL         C  -750       Target         ImageL
-#> 7      S01       1      ImageL         C  -700       Target         ImageL
-#> 8      S01       1      ImageL         C  -650   Distractor         ImageR
-#> 9      S01       1      ImageL         C  -600       Target         ImageL
-#> 10     S01       1      ImageL         C  -550      tracked        tracked
+#> 1      S01       1      ImageL         A -1000   Distractor         ImageR
+#> 2      S01       1      ImageL         A  -950      tracked        tracked
+#> 3      S01       1      ImageL         A  -900   Distractor         ImageR
+#> 4      S01       1      ImageL         A  -850   Distractor         ImageR
+#> 5      S01       1      ImageL         A  -800   Distractor         ImageR
+#> 6      S01       1      ImageL         A  -750      tracked        tracked
+#> 7      S01       1      ImageL         A  -700       Target         ImageL
+#> 8      S01       1      ImageL         A  -650      tracked        tracked
+#> 9      S01       1      ImageL         A  -600      tracked        tracked
+#> 10     S01       1      ImageL         A  -550   Distractor         ImageR
 #> # ... with 1,630 more rows
 ```
 
@@ -74,10 +74,10 @@ aggregate_looks(two_image_data, response_def, Subject ~ GazeByTarget)
 #> # A tibble: 4 x 11
 #>   Subject Distractor Target Elsewhere Missing Others Primary Looks
 #>     <chr>      <dbl>  <dbl>     <dbl>   <dbl>  <dbl>   <dbl> <dbl>
-#> 1     S01         85    212        73      40     85     212   410
-#> 2     S02        110    130       117      53    110     130   410
-#> 3     S03        112    148       124      26    112     148   410
-#> 4     S04         61    253        52      44     61     253   410
+#> 1     S01        137     81       165      27    137      81   410
+#> 2     S02        113    115       115      67    113     115   410
+#> 3     S03         99    192       109      10     99     192   410
+#> 4     S04        127    103       130      50    127     103   410
 #> # ... with 3 more variables: Prop <dbl>, PropSE <dbl>, PropNA <dbl>
 ```
 
@@ -88,18 +88,18 @@ aggregate_looks(two_image_data, response_def, Subject + Condition ~ GazeByTarget
 #> # A tibble: 12 x 12
 #>    Subject Condition Distractor Target Elsewhere Missing Others Primary
 #>      <chr>     <chr>      <dbl>  <dbl>     <dbl>   <dbl>  <dbl>   <dbl>
-#> 1      S01         A         29     61        24       9     29      61
-#> 2      S01         B          8     16        10       7      8      16
-#> 3      S01         C         48    135        39      24     48     135
-#> 4      S02         A         36     43        28      16     36      43
-#> 5      S02         B         11     13        11       6     11      13
-#> 6      S02         C         63     74        78      31     63      74
-#> 7      S03         A         36     43        37       7     36      43
-#> 8      S03         B         14     13        11       3     14      13
-#> 9      S03         C         62     92        76      16     62      92
-#> 10     S04         A         18     76        16      13     18      76
-#> 11     S04         B          6     24         9       2      6      24
-#> 12     S04         C         37    153        27      29     37     153
+#> 1      S01         A         41     17        53      12     41      17
+#> 2      S01         B         60     46        52       6     60      46
+#> 3      S01         C         36     18        60       9     36      18
+#> 4      S02         A         34     36        35      18     34      36
+#> 5      S02         B         47     48        45      24     47      48
+#> 6      S02         C         32     31        35      25     32      31
+#> 7      S03         A         25     67        29       2     25      67
+#> 8      S03         B         42     77        42       3     42      77
+#> 9      S03         C         32     48        38       5     32      48
+#> 10     S04         A         38     35        35      15     38      35
+#> 11     S04         B         54     41        51      18     54      41
+#> 12     S04         C         35     27        44      17     35      27
 #> # ... with 4 more variables: Looks <dbl>, Prop <dbl>, PropSE <dbl>,
 #> #   PropNA <dbl>
 ```
@@ -118,11 +118,49 @@ aggregate_looks(two_image_data, location_def, Subject ~ GazeByLocation)
 #> # A tibble: 4 x 11
 #>   Subject ImageL ImageR Elsewhere Missing Others Primary Looks      Prop
 #>     <chr>  <dbl>  <dbl>     <dbl>   <dbl>  <dbl>   <dbl> <dbl>     <dbl>
-#> 1     S01    187    110        73      40    187     110   410 0.3703704
-#> 2     S02    126    114       117      53    126     114   410 0.4750000
-#> 3     S03    137    123       124      26    137     123   410 0.4730769
-#> 4     S04    209    105        52      44    209     105   410 0.3343949
+#> 1     S01     96    122       165      27     96     122   410 0.5596330
+#> 2     S02    121    107       115      67    121     107   410 0.4692982
+#> 3     S03    162    129       109      10    162     129   410 0.4432990
+#> 4     S04    112    118       130      50    112     118   410 0.5130435
 #> # ... with 2 more variables: PropSE <dbl>, PropNA <dbl>
+```
+
+Or we can handle data from a hypothetical four-image experiment.
+
+``` r
+four_image_data
+#> # A tibble: 1,640 x 6
+#>    Subject TrialNo TargetImage Condition  Time GazeByTarget
+#>      <chr>   <int>       <chr>     <chr> <dbl>        <chr>
+#> 1      S01       1  UpperRight         B -1000       Target
+#> 2      S01       1  UpperRight         B  -950      tracked
+#> 3      S01       1  UpperRight         B  -900   Competitor
+#> 4      S01       1  UpperRight         B  -850       Target
+#> 5      S01       1  UpperRight         B  -800       Target
+#> 6      S01       1  UpperRight         B  -750         <NA>
+#> 7      S01       1  UpperRight         B  -700       Target
+#> 8      S01       1  UpperRight         B  -650   Competitor
+#> 9      S01       1  UpperRight         B  -600       Target
+#> 10     S01       1  UpperRight         B  -550         <NA>
+#> # ... with 1,630 more rows
+
+four_image_def <- list(
+  primary = c("Target"),
+  others = c("FoilA", "FoilB", "Competitor"),
+  elsewhere = c("tracked"),
+  missing = c(NA)
+)
+
+aggregate_looks(four_image_data, four_image_def, Subject ~ GazeByTarget)
+#> # A tibble: 4 x 13
+#>   Subject Competitor FoilA FoilB Target Elsewhere Missing Others Primary
+#>     <chr>      <dbl> <dbl> <dbl>  <dbl>     <dbl>   <dbl>  <dbl>   <dbl>
+#> 1     S01         98    20    39    166        26      61    157     166
+#> 2     S02         71    27    42    169        28      73    140     169
+#> 3     S03         91    19    43    152        30      75    153     152
+#> 4     S04         91    13    42    167        28      69    146     167
+#> # ... with 4 more variables: Looks <dbl>, Prop <dbl>, PropSE <dbl>,
+#> #   PropNA <dbl>
 ```
 
 ### others
