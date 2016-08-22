@@ -43,13 +43,6 @@ interpolate_looks <- function(x, window, fps, response_col, interp_col,
 }
 
 
-
-
-
-
-
-
-
 interpolate_looks_one <- function(x, window, fps, response_col, interp_col,
                               fillable, missing_looks) {
   is_missing_look <- function(xs) xs %in% missing_looks

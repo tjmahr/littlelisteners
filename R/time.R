@@ -1,3 +1,17 @@
+#' @export
+find_frequent_interval <- function(xs, min_freq = .80) {
+  df <- data_frame(x = xs)
+  most_frequent_values <- df %>%
+    filter_(~ !is.na(x)) %>%
+    count_(~ x) %>%
+    mutate_(frequency = ~ n / max(n)) %>%
+    filter_(~ min_freq <= frequency)
+
+  list(lower = min(most_frequent_values$x),
+       upper = max(most_frequent_values$x))
+}
+
+
 
 #' @export
 adjust_times_around_zero <- function(x, time_col = "Time", fps = 60, ties = "first") {
