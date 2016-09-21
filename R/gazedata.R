@@ -72,13 +72,6 @@ correct_distances <- function(gaze) {
 #'   pair \code{(XLeft = NA, XRight = .5)} yields \code{XMean = .5}.
 #' }
 #'
-#' Information about the task, block number, and subject id are extracted from
-#' the basename of the gazedata file. This function expects the gazedata file
-#' to have the format \code{[Task]_[BlockNo]_[SubjectID].gazedata}.
-#'
-#' Information about the stimuli for each trial is extracted from the associated
-#' \code{.txt} file that is output by E-prime. These values are handled by the
-#' \code{Stimdata} function.
 #' @references \href{http://bit.ly/1AtKyhR}{Tobii Toolbox for Matlab: Product
 #'   Description & User Guide}
 #' @export
