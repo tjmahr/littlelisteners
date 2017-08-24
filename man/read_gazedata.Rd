@@ -28,8 +28,8 @@ to NA, and flip y-axis so the origin is the lower-left corner. Defaults to
 }
 \value{
 A dataframe containing the parsed gazedata. Each row of the dataframe
-  contains the eye-tracking data for a single frame of time recorded during
-  the experiment.
+contains the eye-tracking data for a single frame of time recorded during
+the experiment.
 }
 \description{
 Loads \code{.gazedata} file created by an Eprime experiment running on a
@@ -45,35 +45,26 @@ Once these column values are loaded, we make three modifications to the
 gazedata (when \code{apply_corrections} is TRUE).
 
 \enumerate{
-  \item Gaze measurements with \code{Validity} codes greater than or equal to
-  1 are replaced with NA values.
+\item Gaze measurements with \code{Validity} codes greater than or equal to
+1 are replaced with NA values.
 
-  \item X,Y gaze values are defined in screen proportions. Values that fall
-  outside [0,1] are outside of the boundaries of the screen and therefore are
-  nonsensical. Replace them with \code{NA}. We perform a similar correction
-  on pupil diameters and eye-distances by replacing negative
-  values with \code{NA}.
+\item X,Y gaze values are defined in screen proportions. Values that fall
+outside \link{0,1} are outside of the boundaries of the screen and therefore are
+nonsensical. Replace them with \code{NA}. We perform a similar correction
+on pupil diameters and eye-distances by replacing negative
+values with \code{NA}.
 
-  \item The origin of the screen is the upper-left-hand corner of the screen.
-  Flip the y-values so that the origin is in a more familiar position in the
-  lower-left-hand corner of the screen. This way, low y values are closer to
-  the bottom of the screen.
+\item The origin of the screen is the upper-left-hand corner of the screen.
+Flip the y-values so that the origin is in a more familiar position in the
+lower-left-hand corner of the screen. This way, low y values are closer to
+the bottom of the screen.
 
-  \item Compute the mean x, y, distance and diameter values for the left and
-  right eyes. \code{NA} values are ignored when computing the mean, so the
-  pair \code{(XLeft = NA, XRight = .5)} yields \code{XMean = .5}.
+\item Compute the mean x, y, distance and diameter values for the left and
+right eyes. \code{NA} values are ignored when computing the mean, so the
+pair \code{(XLeft = NA, XRight = .5)} yields \code{XMean = .5}.
 }
-
-Information about the task, block number, and subject id are extracted from
-the basename of the gazedata file. This function expects the gazedata file
-to have the format \code{[Task]_[BlockNo]_[SubjectID].gazedata}.
-
-Information about the stimuli for each trial is extracted from the associated
-\code{.txt} file that is output by E-prime. These values are handled by the
-\code{Stimdata} function.
 }
 \references{
 \href{http://bit.ly/1AtKyhR}{Tobii Toolbox for Matlab: Product
-  Description & User Guide}
+Description & User Guide}
 }
-

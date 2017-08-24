@@ -34,7 +34,7 @@ library(littlelisteners)
 
 
 ```{r, echo = FALSE}
-response_def <- list(
+response_def <- create_response_def(
   primary = "Target",
   others = "Distractor",
   elsewhere = "tracked",
@@ -59,9 +59,9 @@ frames <- tidyr::crossing(
   Time = -20:20 * 50)
 
 frames <- frames %>% 
-  rowwise %>% 
+  rowwise() %>% 
   mutate(GazeByTarget = sample(x = unlist(response_def), 1, prob = c(PTarget, PDist, PDist, PNA))) %>% 
-  ungroup %>% 
+  ungroup() %>% 
   select(-PTarget, -PElse, -PDist, -PNA)
 
 frames$DistractorImage <- ifelse(frames$TargetImage == "ImageL", "ImageR", "ImageL")
@@ -71,7 +71,7 @@ frames$GazeByLocation <- ifelse(frames$GazeByTarget %in% "Distractor", frames$Di
 
 two_image_data <- frames %>% select(-DistractorImage)
 
-four_image_def <- list(
+four_image_def <- create_response_def(
   primary = c("Target"),
   others = c("FoilA", "FoilB", "Competitor"),
   elsewhere = c("tracked"),
@@ -124,7 +124,7 @@ for a two-image experiment with a `"Target"` image and `"Distractor"` and other
 looks are either `"tracked"` or missing (`NA`).
 
 ```{r}
-response_def <- list(
+response_def <- create_response_def(
   primary = "Target",
   others = "Distractor",
   elsewhere = "tracked",
@@ -153,7 +153,7 @@ definitions. For instance, we can compare left vs right images by writing a new
 response definition.
 
 ```{r}
-location_def <- list(
+location_def <- create_response_def(
   primary = "ImageR",
   others = "ImageL",
   elsewhere = "tracked",
@@ -168,7 +168,7 @@ Or we can handle data from a hypothetical four-image experiment.
 ```{r}
 four_image_data
 
-four_image_def <- list(
+four_image_def <- create_response_def(
   primary = c("Target"),
   others = c("FoilA", "FoilB", "Competitor"),
   elsewhere = c("tracked"),

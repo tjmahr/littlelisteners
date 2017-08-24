@@ -16,7 +16,7 @@ empirical_logit_weight(x, y)
 }
 \value{
 \code{empirical_logit} returns the empirical logit of looking to
-  target. \code{empirical_logit_weight} returns weights for these values.
+target. \code{empirical_logit_weight} returns weights for these values.
 }
 \description{
 Compute empirical logit
@@ -26,4 +26,3 @@ Dale Barr's
 \href{http://talklab.psy.gla.ac.uk/tvw/elogit-wt.html}{Walkthrough of an
 "empirical logit" analysis in R}
 }
-

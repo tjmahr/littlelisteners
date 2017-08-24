@@ -22,4 +22,3 @@ DataWiz files have several columns F0, F33, F67, etc. for each time sample.
 This function converts a dataframe from such a file into a long format, where
 there is a single time column and single column of gaze responses.
 }
-

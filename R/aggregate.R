@@ -1,4 +1,6 @@
 
+
+
 #' Aggregate looks
 #'
 #' @param data a long data frame of looking data
@@ -14,21 +16,46 @@
 #'   character values of column names.
 #' @export
 aggregate_looks <- function(data, resp_def, formula) {
-  resp_col <- as.character(formula)[3]
-  grouping <- all.vars(formula[[2]])
-  aggregate_looks_(data, resp_def, grouping, resp_col)
+  resp_var <- quo(!! formula[[3]])
+  grouping <- quos(!!! syms(all.vars(formula[[2]])))
+  aggregate_looks2(data, resp_def, !!! grouping, resp_var = !! resp_var)
 }
 
+#' Create a response definition
+#' @param primary the primary response of interest
+#' @param others other responses of interest
+#' @param elsewhere responses to ignore
+#' @param missing responses that indicate missing data. Defaults to NA.
+#' @return a list
+#' @export
+#' @rdname response-definition
+create_response_def <- function(primary, others, elsewhere = NULL, missing = NA) {
+  list(
+    primary = primary,
+    others = others,
+    elsewhere = elsewhere,
+    missing = missing
+  )
+}
 
-#' Standard-evaluation version of `aggregate_looks`
+#' Alternative function for aggregating looks
+#'
+#'
 #'
 #' @inheritParams aggregate_looks
-#' @param grouping Grouping columns.
-#' @param resp_col Name of the column that contains eyetracking responses.
+#' @param ... Grouping columns.
+#' @param resp_var Name of the column that contains eyetracking responses.
+#' @return a dataframe of the grouping columns with columns plus columns with
+#'   the number of responses and the proportion/se of looks to the primary
+#'   response type and the proportion of missing data
 #' @export
-aggregate_looks_ <- function(data, resp_def, grouping, resp_col) {
+aggregate_looks2 <- function(data, resp_def, ..., resp_var) {
+  grouping <- quos(...)
+  grouping_data <- data %>% distinct(!!! grouping)
+  resp_var <- enquo(resp_var)
+
   # Check that all response types have a coding
-  resp_vals <- unique(data[[resp_col]])
+  resp_vals <- unique(pull(data, !! resp_var))
   check_resp_def(resp_def, resp_vals)
 
   # Check that a grouping column name doesn't show up as a gaze column name
@@ -36,17 +63,19 @@ aggregate_looks_ <- function(data, resp_def, grouping, resp_col) {
                      "Prop", "PropSE", "PropMissing")
 
   if (any(grouping %in% reserved_name)) {
-    illegal_names <- grouping[grouping %in% reserved_name] %>%
+    group_names <- names(grouping_data)
+    illegal_names <- group_names[grouping %in% reserved_name] %>%
       paste0(collapse = ", ")
 
     stop("Please rename the following grouping variables: ", illegal_names)
   }
+  n <- sym("n")
 
   data_wide <- data %>%
-    group_by_(.dots = grouping) %>%
-    count_(resp_col) %>%
-    ungroup %>%
-    tidyr::spread_(key_col = resp_col, value_col = "n", fill = 0) %>%
+    group_by(!!! grouping) %>%
+    count(!! resp_var) %>%
+    ungroup() %>%
+    tidyr::spread(!! resp_var, !! n, fill = 0) %>%
     tibble::remove_rownames()
 
   data_wide$Elsewhere <- data_wide %>%
@@ -65,11 +94,18 @@ aggregate_looks_ <- function(data, resp_def, grouping, resp_col) {
   data_wide$Primary <- data_wide %>%
     maybe_row_sums(with_na_label(resp_def$primary))
 
+  primary <- sym("Primary")
+  others <- sym("Others")
+  elsewhere <- sym("Elsewhere")
+  missing <- sym("Missing")
+  prop <- sym("Prop")
+  looks <- sym("Looks")
+
   data_wide %>%
-    mutate_(Looks = ~ Primary + Others + Elsewhere + Missing,
-            Prop = ~ Primary / (Others + Primary),
-            PropSE = ~ se_prop(Prop, Others + Primary),
-            PropNA = ~ Missing / Looks)
+    mutate(Looks = UQ(primary) + UQ(others) + UQ(elsewhere) + UQ(missing),
+           Prop = UQ(primary) / (UQ(others) + UQ(primary)),
+           PropSE = se_prop(UQ(prop), UQ(others) + UQ(primary)),
+           PropNA = UQ(missing) / UQ(looks))
 }
 
 
@@ -79,7 +115,8 @@ check_resp_def <- function(resp_def, observed_resp_vals) {
 
   if (length(missing) != 0) {
     bad <- paste0(missing, collapse = ", ")
-    stop("Values not found in response definition: ", bad, call. = FALSE)
+    stop("Response values not found in response definition: ",
+         bad, call. = FALSE)
   }
   NULL
 }

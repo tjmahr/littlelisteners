@@ -31,14 +31,12 @@ These would typically be AOI locations.}
 }
 \description{
 Fills in windows of missing data if the same AOI is fixated at
-  beginning and end of the missing data window. For example, the sequence
-  `"Target", NA, NA, "Target"` would be interpolated to be `"Target",
-  "Target", "Target", "Target"`.
+beginning and end of the missing data window. For example, the sequence
+\code{"Target", NA, NA, "Target"} would be interpolated to be \code{"Target", "Target", "Target", "Target"}.
 }
 \details{
-Use `window` to constrain the duration of missing data windows that
-  can be filled. We conventionally use 150ms because we would not expect
-  someone to shift their gaze from Image A to Image B to Image A in that
-  amount of time.
+Use \code{window} to constrain the duration of missing data windows that
+can be filled. We conventionally use 150ms because we would not expect
+someone to shift their gaze from Image A to Image B to Image A in that
+amount of time.
 }
-

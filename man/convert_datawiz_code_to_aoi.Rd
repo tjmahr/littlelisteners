@@ -11,9 +11,8 @@ convert_datawiz_code_to_aoi(xs)
 }
 \value{
 the vector with NA for "-", "Target" for "1", "Distractor" for "0", and
-  "tracked" for ".".
+"tracked" for ".".
 }
 \description{
 Convert to DataWiz codes to AOI names
 }
-

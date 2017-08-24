@@ -41,7 +41,7 @@ read_datawiz <- function(filename, sampling_rate = 33.3333) {
   # Break up tab-delimited tokens in first line to get column names
   raw_first_line_tokens <- readr::read_lines(filename, n_max = 1) %>%
     stringr::str_split("\t") %>%
-    unlist
+    unlist()
 
   # F0, F33, etc are time samples at 0ms, 33 ms, etc. The blank column names
   # are time samples that occur before F0. We convert the blanks to times

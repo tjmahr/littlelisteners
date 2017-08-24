@@ -1,7 +1,7 @@
 context("aggregate")
 
 test_that("aggregate_looks works like lookr::AggregateLooks", {
-  lookr_def <- list(
+  lookr_def <- create_response_def(
     primary = c("Target"),
     others = c("Distractor"),
     elsewhere = c("tracked"),
@@ -45,7 +45,7 @@ test_that("aggregate_looks works like lookr::AggregateLooks", {
 })
 
 test_that("aggregate_looks (NSE)", {
-  four_img_def <- list(
+  four_img_def <- create_response_def(
     primary = c("Target"),
     others = c("Distractor1", "Distractor2", "Distractor3"),
     elsewhere = c("tracked"),
@@ -67,15 +67,15 @@ test_that("aggregate_looks (NSE)", {
   nse_results <- aggregate_looks(data, four_img_def,
                                  Subject ~ GazeByImageAOI)
 
-  se_results <- aggregate_looks_(data, four_img_def,
-                                 "Subject", "GazeByImageAOI")
+  se_results <- aggregate_looks2(data, four_img_def, Subject,
+                                 resp_var = GazeByImageAOI)
 
   testthat::expect_equal(nse_results, se_results)
 
   nse_results <- aggregate_looks(data, four_img_def,
                                  Subject + Time ~ GazeByImageAOI)
-  se_results <- aggregate_looks_(data, four_img_def,
-                                 c("Subject", "Time"), "GazeByImageAOI")
+  se_results <- aggregate_looks2(data, four_img_def,
+                                 Subject, Time, resp_var = GazeByImageAOI)
 
   testthat::expect_equal(nse_results, se_results)
 })
