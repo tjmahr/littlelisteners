@@ -44,7 +44,7 @@ test_that("aggregate_looks works like lookr::AggregateLooks", {
 
 })
 
-test_that("aggregate_looks (NSE)", {
+test_that("aggregate_looks2", {
   four_img_def <- create_response_def(
     primary = c("Target"),
     others = c("Distractor1", "Distractor2", "Distractor3"),
@@ -67,15 +67,14 @@ test_that("aggregate_looks (NSE)", {
   nse_results <- aggregate_looks(data, four_img_def,
                                  Subject ~ GazeByImageAOI)
 
-  se_results <- aggregate_looks2(data, four_img_def, Subject,
-                                 resp_var = GazeByImageAOI)
+  se_results <- aggregate_looks2(data, four_img_def, GazeByImageAOI, Subject)
 
   testthat::expect_equal(nse_results, se_results)
 
   nse_results <- aggregate_looks(data, four_img_def,
                                  Subject + Time ~ GazeByImageAOI)
-  se_results <- aggregate_looks2(data, four_img_def,
-                                 Subject, Time, resp_var = GazeByImageAOI)
+  se_results <- aggregate_looks2(data, four_img_def, GazeByImageAOI,
+                                 Subject, Time)
 
   testthat::expect_equal(nse_results, se_results)
 })

@@ -15,6 +15,9 @@ create_response_def(primary, others, elsewhere = NULL, missing = NA)
 
 \item{missing}{responses that indicate missing data. Defaults to NA.}
 }
+\value{
+a list
+}
 \description{
 Create a response definition
 }

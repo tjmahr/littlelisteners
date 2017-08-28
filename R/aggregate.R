@@ -3,6 +3,8 @@
 
 #' Aggregate looks
 #'
+#' This function uses an aggregation formula.
+#'
 #' @param data a long data frame of looking data
 #' @param resp_def a "response definition" list that describes eyetracking
 #'   response values. The list should have elements named "primary", "others",
@@ -12,13 +14,12 @@
 #' @return a dataframe of the grouping columns with columns plus columns with
 #'   the number of responses and the proportion/se of looks to the primary
 #'   response type and the proportion of missing data
-#' @seealso aggregate_looks_ for a version that uses regular evaluation on
-#'   character values of column names.
+#' @seealso `aggregate_looks2` for a version that does not use a formula.
 #' @export
 aggregate_looks <- function(data, resp_def, formula) {
   resp_var <- quo(!! formula[[3]])
   grouping <- quos(!!! syms(all.vars(formula[[2]])))
-  aggregate_looks2(data, resp_def, !!! grouping, resp_var = !! resp_var)
+  aggregate_looks2(data, resp_def, !! resp_var, !!! grouping)
 }
 
 #' Create a response definition
@@ -40,16 +41,14 @@ create_response_def <- function(primary, others, elsewhere = NULL, missing = NA)
 
 #' Alternative function for aggregating looks
 #'
-#'
-#'
 #' @inheritParams aggregate_looks
-#' @param ... Grouping columns.
 #' @param resp_var Name of the column that contains eyetracking responses.
+#' @param ... Grouping columns.
 #' @return a dataframe of the grouping columns with columns plus columns with
 #'   the number of responses and the proportion/se of looks to the primary
 #'   response type and the proportion of missing data
 #' @export
-aggregate_looks2 <- function(data, resp_def, ..., resp_var) {
+aggregate_looks2 <- function(data, resp_def, resp_var, ...) {
   grouping <- quos(...)
   grouping_data <- data %>% distinct(!!! grouping)
   resp_var <- enquo(resp_var)

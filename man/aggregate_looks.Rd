@@ -22,9 +22,8 @@ the number of responses and the proportion/se of looks to the primary
 response type and the proportion of missing data
 }
 \description{
-Aggregate looks
+This function uses an aggregation formula.
 }
 \seealso{
-aggregate_looks_ for a version that uses regular evaluation on
-character values of column names.
+\code{aggregate_looks2} for a version that does not use a formula.
 }

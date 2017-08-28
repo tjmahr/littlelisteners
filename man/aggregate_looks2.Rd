@@ -4,7 +4,7 @@
 \alias{aggregate_looks2}
 \title{Alternative function for aggregating looks}
 \usage{
-aggregate_looks2(data, resp_def, ..., resp_var)
+aggregate_looks2(data, resp_def, resp_var, ...)
 }
 \arguments{
 \item{data}{a long data frame of looking data}
@@ -13,9 +13,9 @@ aggregate_looks2(data, resp_def, ..., resp_var)
 response values. The list should have elements named "primary", "others",
 "elsewhere", and "missing".}
 
-\item{...}{Grouping columns.}
-
 \item{resp_var}{Name of the column that contains eyetracking responses.}
+
+\item{...}{Grouping columns.}
 }
 \value{
 a dataframe of the grouping columns with columns plus columns with
