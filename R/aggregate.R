@@ -69,8 +69,9 @@ print.response_def <- function(object, ...) {
 #'
 #' @details
 #' This function is the main tool for preparing eyetracking data for a growth
-#' curve analysis. For example, an aggregation formula `Subject + Time ~ Gaze`
-#' would provide the number of looks to each image over time for each subject.
+#' curve analysis. For example, an aggregation formula like `Subject + Time ~
+#' Gaze` would provide the number of looks to each image over time for each
+#' subject.
 #'
 #' `aggregate_looks()` uses an aggregation formula like
 #' [stats::aggregate()], whereas `aggregate_looks2()` uses column names.
@@ -112,8 +113,21 @@ print.response_def <- function(object, ...) {
 #'   dplyr::select(.response_def, Subject, BlockNo, Primary:PropNA) %>%
 #'   dplyr::mutate_at(c("Prop", "PropSE", "PropNA"), round, 3)
 #'
+#' # Compute a growth curve
+#' growth_curve <- four_image_data %>%
+#'   adjust_times(Time, TargetOnset, Subject, BlockNo, TrialNo) %>%
+#'   aggregate_looks(target_def, Time ~ GazeByImageAOI) %>%
+#'   filter(-1000 <= Time, Time <= 2000)
 #'
-#'
+#' library(ggplot2)
+#' ggplot(growth_curve) +
+#'   aes(x = Time, y = Prop) +
+#'   geom_hline(size = 2, color = "white", yintercept = .25) +
+#'   geom_vline(size = 2, color = "white", xintercept = 0) +
+#'   geom_pointrange(aes(ymin = Prop - PropSE, ymax = Prop + PropSE)) +
+#'   labs(y = "Proportion of looks to target",
+#'        x = "Time relative to target onset [ms]") +
+#'   theme_grey(base_size = 14)
 aggregate_looks <- function(data, resp_def, formula) {
   resp_var <- quo(!! formula[[3]])
   grouping <- quos(!!! syms(all.vars(formula[[2]])))

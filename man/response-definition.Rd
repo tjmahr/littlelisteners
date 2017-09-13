@@ -37,8 +37,9 @@ shifting between images.
 \item Missing looks: A missing or offscreen gaze.
 }
 
-A \emph{response definition} is a programmatic way of mapping gaze codes to these
-response categories.
+A \emph{response definition} is a programmatic way of describing these response
+types, and it allows \code{aggregate_looks()} to map gaze data into looking
+counts.
 }
 \examples{
 create_response_def(
