@@ -2,4 +2,7 @@
 ^\.Rproj\.user$
 ^README\.Rmd$
 ^README-.*\.png$
-^C:\Users\mahr\Desktop\GitRepos\littlelisteners\docs$
+^docs$
+^inst/site$
+^_pkgdown\.yml$
+^data-raw$

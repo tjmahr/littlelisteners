@@ -5,7 +5,7 @@
 \title{Create a response definition}
 \usage{
 create_response_def(primary, others, elsewhere = NULL, missing = NA,
-  id = NULL)
+  label = NULL)
 }
 \arguments{
 \item{primary}{the primary response of interest}
@@ -14,11 +14,37 @@ create_response_def(primary, others, elsewhere = NULL, missing = NA,
 
 \item{elsewhere}{responses to ignore}
 
-\item{missing}{responses that indicate missing data. Defaults to NA.}
+\item{missing}{responses that indicate missing data. Defaults to \code{NA}.}
+
+\item{label}{optional label for the response definition. Defaults to the
+value of \code{primary}.}
 }
 \value{
-a list
+a \code{response_def} object
 }
 \description{
-Create a response definition
+A response definition controls how \code{aggregate_looks()} works.
+}
+\details{
+To deal with eyetracking data in a generic way, we need a way to describe
+eyetracking responses. We assume that there are four basic gaze types.
+\itemize{
+\item Primary responses: A gaze to a primary or target image.
+\item Other responses: Gazes to competing images.
+\item Elsewhere looks: A gaze that is onscreen but not a primary or
+other response. Typically, this occurs when the participant is
+shifting between images.
+\item Missing looks: A missing or offscreen gaze.
+}
+
+A \emph{response definition} is a programmatic way of mapping gaze codes to these
+response categories.
+}
+\examples{
+create_response_def(
+  label = "looks to target",
+  primary = "Target",
+  others = c("PhonologicalFoil", "SemanticFoil", "Unrelated"),
+  elsewhere = "tracked",
+  missing = NA)
 }

@@ -13,11 +13,14 @@ knitr::opts_chunk$set(
 )
 ```
 
-# little listeners
+# Little Listeners
 
-## installation
+Tools for working with data from word recognition eyetracking experiments.
 
-First install the devtools package, then install the package from this repository.
+## Installation
+
+First install the devtools package, then install the package from this
+repository.
 
 ```{r install, eval = FALSE}
 install.packages("devtools")
@@ -25,13 +28,12 @@ devtools::install_github("tjmahr/littlelisteners")
 ```
 
 
-## overview
+## Overview
 
 ```{r, warning = FALSE,  message = FALSE}
 library(dplyr)
 library(littlelisteners)
 ```
-
 
 ```{r, echo = FALSE}
 response_def <- create_response_def(
@@ -95,7 +97,7 @@ four_image_data$GazeByTarget <- sample(
   prob = c(.35, .05, .075, .175, .05, .15))
 ```
 
-### eyetracking data
+### Eyetracking Data
 
 Here's some made-up data for a hypothetical two-image eyetracking experiment.
 
@@ -107,7 +109,7 @@ Gazes are coded in the `GazeByTarget` column as looks to the `"Target"` or
 `"Distractor"` image with other looks coded as `"tracked"`
 (ambiguous/intermediate location) or `NA` (offscreen or missing). 
 
-### response definitions
+### Response Definitions
 
 To deal with eyetracking data in a generic way, we need a way to describe
 eyetracking responses. We assume that there are four basic gaze types.
@@ -132,7 +134,7 @@ response_def <- create_response_def(
 )
 ```
 
-### `aggregate_looks`
+### `aggregate_looks()`
 
 These response definitions allow us to aggregate looking data in a generic way.
 The function `aggregate_looks` counts the number of looks to each of the four
@@ -186,7 +188,7 @@ to_foila <- create_response_def(
   others = c("Target", "FoilB", "Competitor"),
   elsewhere = c("tracked"),
   missing = c(NA),
-  id = "To Foil A"
+  label = "To Foil A"
 )
 
 to_foilb <- create_response_def(
@@ -194,7 +196,7 @@ to_foilb <- create_response_def(
   others = c("Target", "FoilA", "Competitor"),
   elsewhere = c("tracked"),
   missing = c(NA),
-  id = "To Foil B"
+  label = "To Foil B"
 )
 
 defs <- list(to_foila, to_foilb)
@@ -205,7 +207,7 @@ aggregate_looks(four_image_data, defs, Subject ~ GazeByTarget)
 ```
 
 
-### others
+### Other features
 
 I've also migrated `empirical_logit` functions from [lookr](https://github.com/tjmahr/lookr).
 

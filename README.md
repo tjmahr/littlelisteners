@@ -1,9 +1,11 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-little listeners
+Little Listeners
 ================
 
-installation
+Tools for working with data from word recognition eyetracking experiments.
+
+Installation
 ------------
 
 First install the devtools package, then install the package from this repository.
@@ -13,7 +15,7 @@ install.packages("devtools")
 devtools::install_github("tjmahr/littlelisteners")
 ```
 
-overview
+Overview
 --------
 
 ``` r
@@ -21,7 +23,7 @@ library(dplyr)
 library(littlelisteners)
 ```
 
-### eyetracking data
+### Eyetracking Data
 
 Here's some made-up data for a hypothetical two-image eyetracking experiment.
 
@@ -30,22 +32,22 @@ two_image_data
 #> # A tibble: 1,640 x 7
 #>    Subject TrialNo TargetImage Condition  Time GazeByTarget GazeByLocation
 #>      <chr>   <int>       <chr>     <chr> <dbl>        <chr>          <chr>
-#>  1     S01       1      ImageR         B -1000   Distractor         ImageL
-#>  2     S01       1      ImageR         B  -950       Target         ImageR
-#>  3     S01       1      ImageR         B  -900   Distractor         ImageL
-#>  4     S01       1      ImageR         B  -850      tracked        tracked
-#>  5     S01       1      ImageR         B  -800       Target         ImageR
-#>  6     S01       1      ImageR         B  -750      tracked        tracked
-#>  7     S01       1      ImageR         B  -700   Distractor         ImageL
-#>  8     S01       1      ImageR         B  -650      tracked        tracked
-#>  9     S01       1      ImageR         B  -600       Target         ImageR
-#> 10     S01       1      ImageR         B  -550       Target         ImageR
+#>  1     S01       1      ImageL         A -1000         <NA>           <NA>
+#>  2     S01       1      ImageL         A  -950   Distractor         ImageR
+#>  3     S01       1      ImageL         A  -900      tracked        tracked
+#>  4     S01       1      ImageL         A  -850       Target         ImageL
+#>  5     S01       1      ImageL         A  -800       Target         ImageL
+#>  6     S01       1      ImageL         A  -750   Distractor         ImageR
+#>  7     S01       1      ImageL         A  -700      tracked        tracked
+#>  8     S01       1      ImageL         A  -650       Target         ImageL
+#>  9     S01       1      ImageL         A  -600       Target         ImageL
+#> 10     S01       1      ImageL         A  -550   Distractor         ImageR
 #> # ... with 1,630 more rows
 ```
 
 Gazes are coded in the `GazeByTarget` column as looks to the `"Target"` or `"Distractor"` image with other looks coded as `"tracked"` (ambiguous/intermediate location) or `NA` (offscreen or missing).
 
-### response definitions
+### Response Definitions
 
 To deal with eyetracking data in a generic way, we need a way to describe eyetracking responses. We assume that there are four basic gaze types.
 
@@ -65,7 +67,7 @@ response_def <- create_response_def(
 )
 ```
 
-### `aggregate_looks`
+### `aggregate_looks()`
 
 These response definitions allow us to aggregate looking data in a generic way. The function `aggregate_looks` counts the number of looks to each of the four response categories using an aggregation formula. For example, we can count looks by participant.
 
@@ -74,10 +76,10 @@ aggregate_looks(two_image_data, response_def, Subject ~ GazeByTarget)
 #> # A tibble: 4 x 12
 #>   .response_def Subject Distractor Target Elsewhere Missing Others Primary
 #>           <chr>   <chr>      <dbl>  <dbl>     <dbl>   <dbl>  <dbl>   <dbl>
-#> 1        Target     S01        106    177       119       8    106     177
-#> 2        Target     S02         87    207        97      19     87     207
-#> 3        Target     S03         98    138        98      76     98     138
-#> 4        Target     S04        105    148        83      74    105     148
+#> 1        Target     S01         55    265        37      53     55     265
+#> 2        Target     S02        123    140       134      13    123     140
+#> 3        Target     S03        134     98       117      61    134      98
+#> 4        Target     S04         65    265        58      22     65     265
 #> # ... with 4 more variables: Looks <dbl>, Prop <dbl>, PropSE <dbl>,
 #> #   PropNA <dbl>
 ```
@@ -89,18 +91,18 @@ aggregate_looks(two_image_data, response_def, Subject + Condition ~ GazeByTarget
 #> # A tibble: 12 x 13
 #>    .response_def Subject Condition Distractor Target Elsewhere Missing
 #>            <chr>   <chr>     <chr>      <dbl>  <dbl>     <dbl>   <dbl>
-#>  1        Target     S01         A         31     52        37       3
-#>  2        Target     S01         B         54     93        55       3
-#>  3        Target     S01         C         21     32        27       2
-#>  4        Target     S02         A         21     67        30       5
-#>  5        Target     S02         B         46    100        46      13
-#>  6        Target     S02         C         20     40        21       1
-#>  7        Target     S03         A         33     38        32      20
-#>  8        Target     S03         B         50     75        45      35
-#>  9        Target     S03         C         15     25        21      21
-#> 10        Target     S04         A         36     38        26      23
-#> 11        Target     S04         B         50     78        39      38
-#> 12        Target     S04         C         19     32        18      13
+#>  1        Target     S01         A          9     49        14      10
+#>  2        Target     S01         B         14     84        13      12
+#>  3        Target     S01         C         32    132        10      31
+#>  4        Target     S02         A         27     26        26       3
+#>  5        Target     S02         B         40     42        38       3
+#>  6        Target     S02         C         56     72        70       7
+#>  7        Target     S03         A         29     20        22      11
+#>  8        Target     S03         B         42     23        36      22
+#>  9        Target     S03         C         63     55        59      28
+#> 10        Target     S04         A         17     51         9       5
+#> 11        Target     S04         B         14     84        18       7
+#> 12        Target     S04         C         34    130        31      10
 #> # ... with 6 more variables: Others <dbl>, Primary <dbl>, Looks <dbl>,
 #> #   Prop <dbl>, PropSE <dbl>, PropNA <dbl>
 ```
@@ -119,10 +121,10 @@ aggregate_looks(two_image_data, location_def, Subject ~ GazeByLocation)
 #> # A tibble: 4 x 12
 #>   .response_def Subject ImageL ImageR Elsewhere Missing Others Primary
 #>           <chr>   <chr>  <dbl>  <dbl>     <dbl>   <dbl>  <dbl>   <dbl>
-#> 1        ImageR     S01    132    151       119       8    132     151
-#> 2        ImageR     S02    119    175        97      19    119     175
-#> 3        ImageR     S03    116    120        98      76    116     120
-#> 4        ImageR     S04    126    127        83      74    126     127
+#> 1        ImageR     S01    181    139        37      53    181     139
+#> 2        ImageR     S02    129    134       134      13    129     134
+#> 3        ImageR     S03    109    123       117      61    109     123
+#> 4        ImageR     S04    167    163        58      22    167     163
 #> # ... with 4 more variables: Looks <dbl>, Prop <dbl>, PropSE <dbl>,
 #> #   PropNA <dbl>
 ```
@@ -134,16 +136,16 @@ four_image_data
 #> # A tibble: 1,640 x 6
 #>    Subject TrialNo TargetImage Condition  Time GazeByTarget
 #>      <chr>   <int>       <chr>     <chr> <dbl>        <chr>
-#>  1     S01       1   UpperLeft         B -1000         <NA>
-#>  2     S01       1   UpperLeft         B  -950       Target
-#>  3     S01       1   UpperLeft         B  -900       Target
-#>  4     S01       1   UpperLeft         B  -850   Competitor
-#>  5     S01       1   UpperLeft         B  -800   Competitor
-#>  6     S01       1   UpperLeft         B  -750       Target
-#>  7     S01       1   UpperLeft         B  -700         <NA>
-#>  8     S01       1   UpperLeft         B  -650   Competitor
-#>  9     S01       1   UpperLeft         B  -600   Competitor
-#> 10     S01       1   UpperLeft         B  -550       Target
+#>  1     S01       1  UpperRight         B -1000       Target
+#>  2     S01       1  UpperRight         B  -950         <NA>
+#>  3     S01       1  UpperRight         B  -900       Target
+#>  4     S01       1  UpperRight         B  -850       Target
+#>  5     S01       1  UpperRight         B  -800         <NA>
+#>  6     S01       1  UpperRight         B  -750         <NA>
+#>  7     S01       1  UpperRight         B  -700   Competitor
+#>  8     S01       1  UpperRight         B  -650         <NA>
+#>  9     S01       1  UpperRight         B  -600         <NA>
+#> 10     S01       1  UpperRight         B  -550         <NA>
 #> # ... with 1,630 more rows
 
 four_image_def <- create_response_def(
@@ -157,10 +159,10 @@ aggregate_looks(four_image_data, four_image_def, Subject ~ GazeByTarget)
 #> # A tibble: 4 x 14
 #>   .response_def Subject Competitor FoilA FoilB Target Elsewhere Missing
 #>           <chr>   <chr>      <dbl> <dbl> <dbl>  <dbl>     <dbl>   <dbl>
-#> 1        Target     S01         95    24    37    163        23      68
-#> 2        Target     S02         90    25    45    164        24      62
-#> 3        Target     S03         85    20    28    191        29      57
-#> 4        Target     S04         80    16    43    181        16      74
+#> 1        Target     S01         84    32    34    164        20      76
+#> 2        Target     S02         88    24    27    172        29      70
+#> 3        Target     S03         85    28    34    161        27      75
+#> 4        Target     S04         79    24    33    171        26      77
 #> # ... with 6 more variables: Others <dbl>, Primary <dbl>, Looks <dbl>,
 #> #   Prop <dbl>, PropSE <dbl>, PropNA <dbl>
 ```
@@ -173,7 +175,7 @@ to_foila <- create_response_def(
   others = c("Target", "FoilB", "Competitor"),
   elsewhere = c("tracked"),
   missing = c(NA),
-  id = "To Foil A"
+  label = "To Foil A"
 )
 
 to_foilb <- create_response_def(
@@ -181,7 +183,7 @@ to_foilb <- create_response_def(
   others = c("Target", "FoilA", "Competitor"),
   elsewhere = c("tracked"),
   missing = c(NA),
-  id = "To Foil B"
+  label = "To Foil B"
 )
 
 defs <- list(to_foila, to_foilb)
@@ -191,19 +193,19 @@ aggregate_looks(four_image_data, defs, Subject ~ GazeByTarget)
 #> # A tibble: 8 x 14
 #>   .response_def Subject Competitor FoilA FoilB Target Elsewhere Missing
 #>           <chr>   <chr>      <dbl> <dbl> <dbl>  <dbl>     <dbl>   <dbl>
-#> 1     To Foil A     S01         95    24    37    163        23      68
-#> 2     To Foil A     S02         90    25    45    164        24      62
-#> 3     To Foil A     S03         85    20    28    191        29      57
-#> 4     To Foil A     S04         80    16    43    181        16      74
-#> 5     To Foil B     S01         95    24    37    163        23      68
-#> 6     To Foil B     S02         90    25    45    164        24      62
-#> 7     To Foil B     S03         85    20    28    191        29      57
-#> 8     To Foil B     S04         80    16    43    181        16      74
+#> 1     To Foil A     S01         84    32    34    164        20      76
+#> 2     To Foil A     S02         88    24    27    172        29      70
+#> 3     To Foil A     S03         85    28    34    161        27      75
+#> 4     To Foil A     S04         79    24    33    171        26      77
+#> 5     To Foil B     S01         84    32    34    164        20      76
+#> 6     To Foil B     S02         88    24    27    172        29      70
+#> 7     To Foil B     S03         85    28    34    161        27      75
+#> 8     To Foil B     S04         79    24    33    171        26      77
 #> # ... with 6 more variables: Others <dbl>, Primary <dbl>, Looks <dbl>,
 #> #   Prop <dbl>, PropSE <dbl>, PropNA <dbl>
 ```
 
-### others
+### Other features
 
 I've also migrated `empirical_logit` functions from [lookr](https://github.com/tjmahr/lookr).
 

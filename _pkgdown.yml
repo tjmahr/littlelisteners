@@ -1,0 +1,27 @@
+reference:
+  - title: "Aggregating data"
+    desc: >
+      Functions for aggregating looking data.
+    contents:
+      - create_response_def
+      - aggregate_looks
+      - aggregate_looks2
+  - title: "Manipulating eyetracking data"
+    desc: >
+      Functions for manipulating eyetracking data
+    contents:
+      - adjust_times
+  - title: "Miscellany"
+    desc: >
+      Utility functions
+    contents:
+      - empirical_logit
+  - title: "Little Listeners project"
+    desc: >
+      These functions apply only to data collected for the
+      Little Listeners project.
+    contents:
+      - convert_datawiz_code_to_aoi
+      - melt_datawiz
+      - read_datawiz
+      - read_gazedata

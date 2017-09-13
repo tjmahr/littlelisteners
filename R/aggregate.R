@@ -1,38 +1,43 @@
-
-
-
-#' Aggregate looks
-#'
-#' This function uses an aggregation formula.
-#'
-#' @param data a long data frame of looking data
-#' @param resp_def a "response definition" list that describes eyetracking
-#'   response values. The list should have elements named "primary", "others",
-#'   "elsewhere", and "missing".
-#' @param formula an aggregation formula. The lefthand terms will be grouping
-#'   variables, and the righthand term is the column with eyetracking responses.
-#' @return a dataframe of the grouping columns with columns plus columns with
-#'   the number of responses and the proportion/se of looks to the primary
-#'   response type and the proportion of missing data
-#' @seealso `aggregate_looks2` for a version that does not use a formula.
-#' @export
-aggregate_looks <- function(data, resp_def, formula) {
-  resp_var <- quo(!! formula[[3]])
-  grouping <- quos(!!! syms(all.vars(formula[[2]])))
-  aggregate_looks2(data, resp_def, !! resp_var, !!! grouping)
-}
-
 #' Create a response definition
+#'
+#' A response definition controls how `aggregate_looks()` works.
+#'
 #' @param primary the primary response of interest
 #' @param others other responses of interest
 #' @param elsewhere responses to ignore
-#' @param missing responses that indicate missing data. Defaults to NA.
-#' @return a list
+#' @param missing responses that indicate missing data. Defaults to `NA`.
+#' @param label optional label for the response definition. Defaults to the
+#'   value of `primary`.
+#' @return a `response_def` object
 #' @export
 #' @rdname response-definition
-create_response_def <- function(primary, others, elsewhere = NULL, missing = NA, id = NULL) {
+#'
+#' @details
+#' To deal with eyetracking data in a generic way, we need a way to describe
+#' eyetracking responses. We assume that there are four basic gaze types.
+#'
+#' * Primary responses: A gaze to a primary or target image.
+#' * Other responses: Gazes to competing images.
+#' * Elsewhere looks: A gaze that is onscreen but not a primary or
+#'   other response. Typically, this occurs when the participant is
+#'   shifting between images.
+#' * Missing looks: A missing or offscreen gaze.
+#'
+#' A _response definition_ is a programmatic way of describing these response
+#' types, and it allows `aggregate_looks()` to map gaze data into looking
+#' counts.
+#'
+#' @examples
+#' create_response_def(
+#'   label = "looks to target",
+#'   primary = "Target",
+#'   others = c("PhonologicalFoil", "SemanticFoil", "Unrelated"),
+#'   elsewhere = "tracked",
+#'   missing = NA)
+create_response_def <- function(primary, others, elsewhere = NULL,
+                                missing = NA, label = NULL) {
   structure(list(
-    response_def = id %||% paste0(primary, collapse = "-"),
+    response_def = label %||% paste0(primary, collapse = "-"),
     primary = primary,
     others = others,
     elsewhere = elsewhere,
@@ -40,20 +45,85 @@ create_response_def <- function(primary, others, elsewhere = NULL, missing = NA,
   ), class = "response_def")
 }
 
-
+#' @export
 print.response_def <- function(object, ...) {
   str(object, ...)
 }
 
-#' Alternative function for aggregating looks
+
+
+#' Aggregate looks
 #'
-#' @inheritParams aggregate_looks
-#' @param resp_var Name of the column that contains eyetracking responses.
-#' @param ... Grouping columns.
-#' @return a dataframe of the grouping columns with columns plus columns with
-#'   the number of responses and the proportion/se of looks to the primary
-#'   response type and the proportion of missing data
+#' Aggregate the number of looks to each response type over some grouping
+#' variables like Subject, Time, Condition.
+#'
+#' @param data a long data frame of looking data
+#' @param resp_def a response definition or a list of response definition.
+#' @param formula an aggregation formula. The lefthand terms will be grouping
+#'   variables, and the righthand term is the column with eyetracking responses.
+#' @return a dataframe of the grouping columns along with the number of looks to
+#'   each response type, the proportion (and standard error) of looks to the
+#'   primary response, and the proportion (and standared error) of missing data.
 #' @export
+#' @rdname aggregating-looks
+#'
+#' @details
+#' This function is the main tool for preparing eyetracking data for a growth
+#' curve analysis. For example, an aggregation formula `Subject + Time ~ Gaze`
+#' would provide the number of looks to each image over time for each subject.
+#'
+#' `aggregate_looks()` uses an aggregation formula like
+#' [stats::aggregate()], whereas `aggregate_looks2()` uses column names.
+#'
+#' @examples
+#' target_def <- create_response_def(
+#'   label = "looks to target",
+#'   primary = "Target",
+#'   others = c("PhonologicalFoil", "SemanticFoil", "Unrelated"),
+#'   elsewhere = "tracked",
+#'   missing = NA)
+#'
+#' four_image_data %>%
+#'   aggregate_looks(target_def, Subject + TrialNo ~ GazeByImageAOI)
+#'
+#' four_image_data %>%
+#'   aggregate_looks(target_def, Subject ~ GazeByImageAOI) %>%
+#'   str()
+#'
+#' # With column names
+#' four_image_data %>%
+#'   aggregate_looks2(target_def, GazeByImageAOI, Subject, TrialNo)
+#'
+#' four_image_data %>%
+#'   aggregate_looks2(target_def, GazeByImageAOI, Subject) %>%
+#'   str()
+#'
+#' phonological_def <- create_response_def(
+#'   label = "looks to phonological foil",
+#'   primary = "PhonologicalFoil",
+#'   others = c("Target", "SemanticFoil", "Unrelated"),
+#'   elsewhere = "tracked",
+#'   missing = NA)
+#'
+#' # Aggregate looks to multiple response definitions at once
+#' defs <- list(target_def, phonological_def)
+#' four_image_data %>%
+#'   aggregate_looks(defs, Subject + BlockNo ~ GazeByImageAOI) %>%
+#'   dplyr::select(.response_def, Subject, BlockNo, Primary:PropNA) %>%
+#'   dplyr::mutate_at(c("Prop", "PropSE", "PropNA"), round, 3)
+#'
+#'
+#'
+aggregate_looks <- function(data, resp_def, formula) {
+  resp_var <- quo(!! formula[[3]])
+  grouping <- quos(!!! syms(all.vars(formula[[2]])))
+  aggregate_looks2(data, resp_def, !! resp_var, !!! grouping)
+}
+
+#' @param resp_var Name of the column that contains eyetracking responses
+#' @param ... Grouping columns.
+#' @export
+#' @rdname aggregating-looks
 aggregate_looks2 <- function(data, resp_def, resp_var, ...) {
   grouping <- quos(...)
   resp_var <- enquo(resp_var)
