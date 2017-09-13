@@ -13,70 +13,157 @@ vignette: >
 knitr::opts_chunk$set(comment = "#>", collapse = TRUE)
 ```
 
-
 Consider data from a Visual World style experiment. On each trial, an array of
 images appears. For example:
 
-```{r sample-screen3, echo = FALSE, out.width = "0%"}
+```{r sample-screen3, echo = FALSE, out.width = "70%"}
 knitr::include_graphics("figure-html/four-image-screen.png")
 ```
 
+The listener hears a prompt to view one of images: _Find the bell_.
 
-The listener hears a prompt to view one of images: _Find the dog_.
+Among these images is a target (here, _bell_), a phonological competitor
+(_bee_), a semantic competitor (_drum_), and an unrelated word (_swing_).
 
+We have some eyetracking data from this experiment for one participant:
 
-
-
-
-The listener hears a prompt to view one of images: _Find the dog_.
-
-
-
-
-Vignettes are long form documentation commonly included in packages. Because they are part of the distribution of the package, they need to be as compact as possible. The `html_vignette` output type provides a custom style sheet (and tweaks some options) to ensure that the resulting html is as small as possible. The `html_vignette` format:
-
-- Never uses retina figures
-- Has a smaller default figure size
-- Uses a custom CSS stylesheet instead of the default Twitter Bootstrap style
-
-## Vignette Info
-
-Note the various macros within the `vignette` section of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the `title` field and the `\VignetteIndexEntry` to match the title of your vignette.
-
-## Styles
-
-The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
-
-    output: 
-      rmarkdown::html_vignette:
-        css: mystyles.css
-
-## Figures
-
-The figure sizes have been customised so that you can easily put two images side-by-side. 
-
-```{r, fig.show='hold'}
-plot(1:10)
-plot(10:1)
+```{r}
+library(littlelisteners)
+library(dplyr, warn.conflicts = FALSE)
+four_image_data
 ```
 
-You can enable figure captions by `fig_caption: yes` in YAML:
+The gazes are coded in the `GazeByImageAOI` column as looks to the `"Target"`,
+`"PhonologicalFoil"`, `"SemanticFoil"`, or `"Unrelated"` images, or as
+`"tracked"` (ambiguous/intermediate location) or `NA` (offscreen or missing).
 
-    output:
-      rmarkdown::html_vignette:
-        fig_caption: yes
 
-Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
+## Response definitions
 
-## More Examples
+To deal with eyetracking data in a generic way, we need a way to describe
+eyetracking responses. We assume that there are four basic gaze types.
 
-You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
+* Primary responses: A gaze to a primary or target image.
+* Other responses: Gazes to competing images.
+* Elsewhere looks: A gaze that is onscreen but not a primary or
+  other response. Typically, this occurs when the participant is
+  shifting between images.
+* Missing looks: A missing or offscreen gaze.
 
-```{r, echo=FALSE, results='asis'}
-knitr::kable(head(mtcars, 10))
+A _response definition_ is a programmatic way of describing these response
+types. In the code below, `response_def` is a response definition for the
+four-image experiment with a `"Target"` image and the three competing images
+lumped together in the `"Others"` `"Distractor"` and other looks are either
+`"tracked"` or missing (`NA`).
+
+```{r}
+response_def <- create_response_def(
+  primary = "Target",
+  others = c("PhonologicalFoil", "SemanticFoil", "Unrelated"),
+  elsewhere = "tracked",
+  missing = NA,
+  label = "looks to target"
+)
+response_def
 ```
 
-Also a quote using `>`:
+## Aggregating looks
 
-> "He who gives up [code] safety for [code] speed deserves neither."
-([via](https://twitter.com/hadleywickham/status/504368538874703872))
+These response definitions allow us to aggregate looking data in a generic way.
+The function `aggregate_looks()` counts the number of looks to each of the four
+response categories using an aggregation formula. For example, we can count
+looks by participant. There are several columns here, so we view `glimpse()` 
+to look at some values from all of them.
+
+```{r}
+four_image_data %>% 
+  aggregate_looks(response_def, Subject ~ GazeByImageAOI) %>% 
+  glimpse()
+```
+
+Or looks by participant by trial. Here we just print the dataframe as is.
+
+```{r}
+four_image_data %>% 
+  aggregate_looks(response_def, Subject + TrialNo ~ GazeByImageAOI)
+```
+
+We can also perform other kind of aggregations using different response
+definitions. For instance, we can compare image locations by writing a new
+response definition.
+
+```{r}
+location_def <- create_response_def(
+  primary = "LowerLeftImage",
+  others = c("UpperRightImage", "UpperLeftImage", "LowerRightImage"),
+  elsewhere = "tracked",
+  missing = NA
+)
+
+aggregate_looks(four_image_data, location_def, Subject ~ GazeByAOI) %>% 
+  glimpse()
+```
+
+We can perform multiple aggreations at once. First, `cycle_response_def()` can
+create a cycle of response definitions where each response acts as the primary
+outcome at least once.
+
+```{r}
+all_defs <- cycle_response_def(response_def)
+all_defs
+```
+
+When given a list of response definitions, `aggregate_looks()` will compute the
+aggregation for each one.
+
+```{r}
+four_image_data %>% 
+  aggregate_looks(all_defs, Subject ~ GazeByImageAOI) %>% 
+  select(ResponseDef = .response_def, Subject, Primary, 
+         Others, Prop, PropSE, PropNA) %>% 
+  knitr::kable()
+```
+
+## Growth curve analysis is aggregating looks over time
+
+With `aggregate_looks()`, we can estimate the growth curves of looking
+probabilities. First, for this data-set, we need to adjust the eyetracking
+timestamps so that time 0 occurs at target onset. We are also going to bin and
+downsample the eyetracking data to have an effective sampling rate of 10 frames
+per second.
+
+```{r}
+growth_curves <- four_image_data %>% 
+  adjust_times(Time, TargetOnset, Subject, BlockNo, TrialNo) %>% 
+  filter(-1005 <= Time, Time <= 2000) %>% 
+  assign_bins(6, Time, Subject, BlockNo, TrialNo) %>% 
+  # Set a time for each bin
+  group_by(Subject, BlockNo, TrialNo, .bin) %>% 
+  mutate(BinTime = round(min(Time))) %>% 
+  aggregate_looks(all_defs, Subject + BinTime ~ GazeByImageAOI) %>% 
+  rename(Time = BinTime)
+```
+
+We now have four growth curves, one for each image type, in a single dataframe.
+
+```{r}
+growth_curves
+```
+
+We can plot these growth curves.
+
+```{r}
+library(ggplot2)
+ggplot(growth_curves) +
+  aes(x = Time, y = Prop, color = .response_def) +
+  geom_hline(size = 2, color = "white", yintercept = .25) +
+  geom_vline(size = 2, color = "white", xintercept = 0) +
+  geom_pointrange(aes(ymin = Prop - PropSE, ymax = Prop + PropSE)) +
+  labs(y = "Proportion of looks",
+       x = "Time relative to target onset [ms]",
+       color = "Image")
+```
+
+
+
+

@@ -28,202 +28,28 @@ devtools::install_github("tjmahr/littlelisteners")
 ```
 
 
-## Overview
+## Learn more
 
-```{r, warning = FALSE,  message = FALSE}
-library(dplyr)
-library(littlelisteners)
-```
+See the [documentation website](https://tjmahr.github.io/littlelisteners/) for
+package tutorials and documentation.
 
-```{r, echo = FALSE}
-response_def <- create_response_def(
-  primary = "Target",
-  others = "Distractor",
-  elsewhere = "tracked",
-  missing = NA
-)
+<!-- ### Other features -->
 
-design <- tidyr::nesting(
-  TrialNo = 1:10, 
-  TargetImage = sample(c("ImageL", "ImageR"), 10, replace = TRUE), 
-  Condition = sample(c("A", "B", "C"), 10, replace = TRUE))
+<!-- I've also migrated `empirical_logit` functions from [lookr](https://github.com/tjmahr/lookr). -->
 
-subject <- tibble::data_frame(
-  Subject = c("S01", "S02", "S03", "S04"),
-  PTarget = runif(4, min = .3, max = .7),
-  PElse = runif(4, min = .025, max = .125),
-  PDist = runif(4, min = (1 - PTarget - PElse) / 2, max = .95 * (1 - PTarget - PElse)),
-  PNA = 1 - PTarget - PElse - PDist)
+<!-- ```{r} -->
+<!-- n_to_target <- c(10, 0, 1, 0) -->
+<!-- n_to_distractor <- c(0, 1, 0, 0) -->
 
-frames <- tidyr::crossing(
-  subject,
-  design, 
-  Time = -20:20 * 50)
+<!-- # undefined log-odds -->
+<!-- log(n_to_target / n_to_distractor) -->
 
-frames <- frames %>% 
-  rowwise() %>% 
-  mutate(GazeByTarget = sample(x = unlist(response_def[-1]), 1, prob = c(PTarget, PDist, PDist, PNA))) %>% 
-  ungroup() %>% 
-  select(-PTarget, -PElse, -PDist, -PNA)
+<!-- # add .5 trick -->
+<!-- log((n_to_target + .5) / (n_to_distractor + .5)) -->
 
-frames$DistractorImage <- ifelse(frames$TargetImage == "ImageL", "ImageR", "ImageL")
-frames$GazeByLocation <- frames$GazeByTarget
-frames$GazeByLocation <- ifelse(frames$GazeByTarget %in% "Target", frames$TargetImage, frames$GazeByLocation)
-frames$GazeByLocation <- ifelse(frames$GazeByTarget %in% "Distractor", frames$DistractorImage, frames$GazeByLocation)
+<!-- # shortcut -->
+<!-- empirical_logit(n_to_target, n_to_distractor) -->
 
-two_image_data <- frames %>% select(-DistractorImage)
-
-four_image_def <- create_response_def(
-  primary = c("Target"),
-  others = c("FoilA", "FoilB", "Competitor"),
-  elsewhere = c("tracked"),
-  missing = c(NA)
-)
-
-four_image_design <- tidyr::nesting(
-  TrialNo = 1:10, 
-  TargetImage = sample(c("UpperLeft", "UpperRight", "LowerLeft", "LowerRight"), 10, replace = TRUE), 
-  Condition = sample(c("A", "B"), 10, replace = TRUE))
-
-four_image_data <- tidyr::crossing(
-  Subject = c("S01", "S02", "S03", "S04"),
-  four_image_design, 
-  Time = -20:20 * 50)
-
-four_image_data$GazeByTarget <- sample(
-  x = unlist(four_image_def[-1]),
-  size = nrow(four_image_data),
-  replace = TRUE,
-  prob = c(.35, .05, .075, .175, .05, .15))
-```
-
-### Eyetracking Data
-
-Here's some made-up data for a hypothetical two-image eyetracking experiment.
-
-```{r}
-two_image_data
-```
-
-Gazes are coded in the `GazeByTarget` column as looks to the `"Target"` or 
-`"Distractor"` image with other looks coded as `"tracked"`
-(ambiguous/intermediate location) or `NA` (offscreen or missing). 
-
-### Response Definitions
-
-To deal with eyetracking data in a generic way, we need a way to describe
-eyetracking responses. We assume that there are four basic gaze types.
-
-* Primary responses: A gaze to a primary or target image.
-* Others: A gaze to a competing image.
-* Elsewhere: A gaze that is onscreen but not a primary or other response.
-  Typically, this occurs when the participant is shifting between images.
-* Missing: A missing or offscreen gaze.
-
-A _response definition_ is a programmatic way of mapping gaze codes to these
-response categories. In the code below, `response_def` is a response definition
-for a two-image experiment with a `"Target"` image and `"Distractor"` and other
-looks are either `"tracked"` or missing (`NA`).
-
-```{r}
-response_def <- create_response_def(
-  primary = "Target",
-  others = "Distractor",
-  elsewhere = "tracked",
-  missing = NA
-)
-```
-
-### `aggregate_looks()`
-
-These response definitions allow us to aggregate looking data in a generic way.
-The function `aggregate_looks` counts the number of looks to each of the four
-response categories using an aggregation formula. For example, we can count looks by participant.
-
-```{r}
-aggregate_looks(two_image_data, response_def, Subject ~ GazeByTarget)
-```
-
-Or looks by participant x condition:
-
-```{r}
-aggregate_looks(two_image_data, response_def, Subject + Condition ~ GazeByTarget)
-```
-
-We can also perform other kind of aggregations using different response
-definitions. For instance, we can compare left vs right images by writing a new
-response definition.
-
-```{r}
-location_def <- create_response_def(
-  primary = "ImageR",
-  others = "ImageL",
-  elsewhere = "tracked",
-  missing = NA
-)
-
-aggregate_looks(two_image_data, location_def, Subject ~ GazeByLocation)
-```
-
-Or we can handle data from a hypothetical four-image experiment.
-
-```{r}
-four_image_data
-
-four_image_def <- create_response_def(
-  primary = c("Target"),
-  others = c("FoilA", "FoilB", "Competitor"),
-  elsewhere = c("tracked"),
-  missing = c(NA)
-)
-
-aggregate_looks(four_image_data, four_image_def, Subject ~ GazeByTarget)
-```
-
-Including multiple aggreations at once.
-
-```{r}
-to_foila <- create_response_def(
-  primary = c("FoilA"),
-  others = c("Target", "FoilB", "Competitor"),
-  elsewhere = c("tracked"),
-  missing = c(NA),
-  label = "To Foil A"
-)
-
-to_foilb <- create_response_def(
-  primary = c("FoilB"),
-  others = c("Target", "FoilA", "Competitor"),
-  elsewhere = c("tracked"),
-  missing = c(NA),
-  label = "To Foil B"
-)
-
-defs <- list(to_foila, to_foilb)
-
-
-aggregate_looks(four_image_data, defs, Subject ~ GazeByTarget)
-
-```
-
-
-### Other features
-
-I've also migrated `empirical_logit` functions from [lookr](https://github.com/tjmahr/lookr).
-
-```{r}
-n_to_target <- c(10, 0, 1, 0)
-n_to_distractor <- c(0, 1, 0, 0)
-
-# undefined log-odds
-log(n_to_target / n_to_distractor)
-
-# add .5 trick
-log((n_to_target + .5) / (n_to_distractor + .5))
-
-# shortcut
-empirical_logit(n_to_target, n_to_distractor)
-
-# weighting function
-empirical_logit_weight(n_to_target, n_to_distractor)
-```
+<!-- # weighting function -->
+<!-- empirical_logit_weight(n_to_target, n_to_distractor) -->
+<!-- ``` -->

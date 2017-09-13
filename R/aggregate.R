@@ -24,7 +24,7 @@
 #' * Missing looks: A missing or offscreen gaze.
 #'
 #' A _response definition_ is a programmatic way of describing these response
-#' types, and it allows `aggregate_looks()` to map gaze data into looking
+#' types, and it allows `aggregate_looks()` to map gaze data onto looking
 #' counts.
 #'
 #' @examples
@@ -50,7 +50,44 @@ print.response_def <- function(object, ...) {
   str(object, ...)
 }
 
+#' Create complementary response definitions
+#'
+#' In the typical response definition, there is a primary response compared to
+#' other competitors. Oftentimes, we are interested in also comparing each of
+#' the competitors to the other images. This function quickly assembles a full
+#' cycle of response definitions.
+#'
+#' @param response_def a response definition to use a template for other
+#'   definitions.
+#' @return a list of response definitions where each member of
+#'   `c(response_def$primary, response_def$others)` is used as the primary
+#'   response.
+#' @export
+#' @examples
+#' # Create one definition
+#' def <- create_response_def(
+#'   primary = 1,
+#'   others = c(5, 8, 9),
+#'   elsewhere = 0,
+#'   missing = NA
+#' )
+#'
+#' # Create the full cycle of response definitions
+#' cycle_response_def(def)
+cycle_response_def <- function(response_def) {
+  responses <- c(response_def$primary, response_def$others)
 
+  f <- function(i) {
+    create_response_def(
+      primary = responses[i],
+      others = responses[-i],
+      elsewhere = response_def$elsewhere,
+      missing = response_def$missing
+    )
+  }
+
+  Map(f, seq_along(responses))
+}
 
 #' Aggregate looks
 #'

@@ -38,7 +38,7 @@ shifting between images.
 }
 
 A \emph{response definition} is a programmatic way of describing these response
-types, and it allows \code{aggregate_looks()} to map gaze data into looking
+types, and it allows \code{aggregate_looks()} to map gaze data onto looking
 counts.
 }
 \examples{
