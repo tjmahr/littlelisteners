@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>AOI-based gaze interpolation — interpolate_looks â€¢ littlelisteners</title>
+<title>Example data from a Visual World experiment — four_image_data â€¢ littlelisteners</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -87,73 +87,26 @@
       <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>AOI-based gaze interpolation</h1>
+    <h1>Example data from a Visual World experiment</h1>
     </div>
 
     
-    <p>Fills in windows of missing data if the same AOI is fixated at
-beginning and end of the missing data window. For example, the sequence
-<code>"Target", NA, NA, "Target"</code> would be interpolated to be <code>"Target", "Target", "Target", "Target"</code>.</p>
+    <p>Example data from a Visual World experiment</p>
     
 
-    <pre class="usage"><span class='fu'>interpolate_looks</span>(<span class='no'>x</span>, <span class='no'>window</span>, <span class='no'>fps</span>, <span class='no'>response_col</span>, <span class='no'>interp_col</span>, <span class='no'>fillable</span>,
-  <span class='no'>missing_looks</span>)</pre>
-    
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>x</th>
-      <td><p>a dataframe of grouped eyetracking data. Each row should be a single
-frame of eyetracking. Use <code><a href='http://dplyr.tidyverse.org/reference/group_by.html'>dplyr::group_by()</a></code> to set the grouping
-columns for the data. The groups should specify a single trial of
-eyetracking data.</p></td>
-    </tr>
-    <tr>
-      <th>window</th>
-      <td><p>maximum amount of missing data (milliseconds) that can be
-interpolated. Only spans of missing data with less than or equal to this
-duration will be interpolated</p></td>
-    </tr>
-    <tr>
-      <th>fps</th>
-      <td><p>number of eyetracking frames (dataframe rows) per second</p></td>
-    </tr>
-    <tr>
-      <th>response_col</th>
-      <td><p>name of the column with the eyetracking response data</p></td>
-    </tr>
-    <tr>
-      <th>interp_col</th>
-      <td><p>name of a column to add to the dataframe. This column
-records whether each frame was interpolated (TRUE) or not (FALSE)</p></td>
-    </tr>
-    <tr>
-      <th>fillable</th>
-      <td><p>values in the response column where interpolation is legal.
-These would typically be AOI locations.</p></td>
-    </tr>
-    <tr>
-      <th>missing_looks</th>
-      <td><p>values that can be imputed</p></td>
-    </tr>
-    </table>
-    
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+    <pre class="usage"><span class='no'>four_image_data</span></pre>
+        
+    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
 
-    <p>Use <code>window</code> to constrain the duration of missing data windows that
-can be filled. We conventionally use 150ms because we would not expect
-someone to shift their gaze from Image A to Image B to Image A in that
-amount of time.</p>
+    <p>A data frame with 20,910 rows and 25 variables</p>
     
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
       
-      <li><a href="#details">Details</a></li>
+      <li><a href="#format">Format</a></li>
           </ul>
 
   </div>

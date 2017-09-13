@@ -4,6 +4,7 @@ reference:
       Functions for aggregating looking data.
     contents:
       - create_response_def
+      - cycle_response_def
       - aggregate_looks
       - aggregate_looks2
   - title: "Manipulating eyetracking data"

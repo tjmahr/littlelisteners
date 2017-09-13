@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Alternative function for aggregating looks — aggregate_looks2 â€¢ littlelisteners</title>
+<title>Pipe operator — %&gt;% â€¢ littlelisteners</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -60,6 +60,18 @@
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/aggregating.html">Aggregating Eyetracking Data</a>
+    </li>
+  </ul>
+</li>
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
@@ -75,53 +87,21 @@
       <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Alternative function for aggregating looks</h1>
+    <h1>Pipe operator</h1>
     </div>
 
     
-    <p>Alternative function for aggregating looks</p>
+    <p>Pipe operator</p>
     
 
-    <pre class="usage"><span class='fu'>aggregate_looks2</span>(<span class='no'>data</span>, <span class='no'>resp_def</span>, <span class='no'>resp_var</span>, <span class='no'>...</span>)</pre>
-    
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>data</th>
-      <td><p>a long data frame of looking data</p></td>
-    </tr>
-    <tr>
-      <th>resp_def</th>
-      <td><p>a "response definition" list that describes eyetracking
-response values. The list should have elements named "primary", "others",
-"elsewhere", and "missing".</p></td>
-    </tr>
-    <tr>
-      <th>resp_var</th>
-      <td><p>Name of the column that contains eyetracking responses.</p></td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td><p>Grouping columns.</p></td>
-    </tr>
-    </table>
-    
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>a dataframe of the grouping columns with columns plus columns with
-the number of responses and the proportion/se of looks to the primary
-response type and the proportion of missing data</p>
-    
+    <pre class="usage"><span class='no'>lhs</span> <span class='kw'>%&gt;%</span> <span class='no'>rhs</span></pre>
+        
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      
-      <li><a href="#value">Value</a></li>
-          </ul>
+                </ul>
 
   </div>
 </div>

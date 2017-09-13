@@ -60,6 +60,18 @@
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/aggregating.html">Aggregating Eyetracking Data</a>
+    </li>
+  </ul>
+</li>
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
@@ -92,58 +104,70 @@
       <tbody>
         <tr>
           <th colspan="2">
-            <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
-            <p class="section-desc"></p>
+            <h2 id="section-aggregating-data" class="hasAnchor"><a href="#section-aggregating-data" class="anchor"></a>Aggregating data</h2>
+            <p class="section-desc"><p>Functions for aggregating looking data.</p></p>
           </th>
         </tr>
         <tr>
           <!--  -->
           <td>
-            <p><code><a href="aggregate_looks.html">aggregate_looks</a></code> </p>
+            <p><code><a href="response-definition.html">create_response_def</a></code> </p>
+          </td>
+          <td><p>Create a response definition</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="cycle_response_def.html">cycle_response_def</a></code> </p>
+          </td>
+          <td><p>Create complementary response definitions</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="aggregating-looks.html">aggregate_looks</a></code> <code><a href="aggregating-looks.html">aggregate_looks2</a></code> </p>
           </td>
           <td><p>Aggregate looks</p></td>
-        </tr><tr>
+        </tr>
+      </tbody><tbody>
+        <tr>
+          <th colspan="2">
+            <h2 id="section-manipulating-eyetracking-data" class="hasAnchor"><a href="#section-manipulating-eyetracking-data" class="anchor"></a>Manipulating eyetracking data</h2>
+            <p class="section-desc"><p>Functions for manipulating eyetracking data</p></p>
+          </th>
+        </tr>
+        <tr>
           <!--  -->
           <td>
-            <p><code><a href="aggregate_looks2.html">aggregate_looks2</a></code> </p>
+            <p><code><a href="adjust_times.html">adjust_times</a></code> </p>
           </td>
-          <td><p>Alternative function for aggregating looks</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="assign_bins.html">assign_bins</a></code> </p>
-          </td>
-          <td><p>Assign bins for downsampling looking data</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="assign_bins_vec.html">assign_bins_vec</a></code> </p>
-          </td>
-          <td><p>Assign bin numbers to a vector</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="convert_datawiz_code_to_aoi.html">convert_datawiz_code_to_aoi</a></code> </p>
-          </td>
-          <td><p>Convert to DataWiz codes to AOI names</p></td>
-        </tr><tr>
+          <td><p>Adjust looking times relative to some event</p></td>
+        </tr>
+      </tbody><tbody>
+        <tr>
+          <th colspan="2">
+            <h2 id="section-miscellany" class="hasAnchor"><a href="#section-miscellany" class="anchor"></a>Miscellany</h2>
+            <p class="section-desc"><p>Utility functions</p></p>
+          </th>
+        </tr>
+        <tr>
           <!--  -->
           <td>
             <p><code><a href="empirical_logit.html">empirical_logit</a></code> <code><a href="empirical_logit.html">empirical_logit_weight</a></code> </p>
           </td>
           <td><p>Compute empirical logit</p></td>
-        </tr><tr>
+        </tr>
+      </tbody><tbody>
+        <tr>
+          <th colspan="2">
+            <h2 id="section-little-listeners-project" class="hasAnchor"><a href="#section-little-listeners-project" class="anchor"></a>Little Listeners project</h2>
+            <p class="section-desc"><p>These functions apply only to data collected for the Little Listeners project.</p></p>
+          </th>
+        </tr>
+        <tr>
           <!--  -->
           <td>
-            <p><code><a href="interpolate_looks.html">interpolate_looks</a></code> </p>
+            <p><code><a href="convert_datawiz_code_to_aoi.html">convert_datawiz_code_to_aoi</a></code> </p>
           </td>
-          <td><p>AOI-based gaze interpolation</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="littlelisteners.html">littlelisteners</a></code> </p>
-          </td>
-          <td><p>littlelisteners.</p></td>
+          <td><p>Convert to DataWiz codes to AOI names</p></td>
         </tr><tr>
           <!--  -->
           <td>
@@ -162,12 +186,6 @@
             <p><code><a href="read_gazedata.html">read_gazedata</a></code> </p>
           </td>
           <td><p>Load a <code>.gazedata</code> file for an experiment</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="response-definition.html">create_response_def</a></code> </p>
-          </td>
-          <td><p>Create a response definition</p></td>
         </tr>
       </tbody>
       </table>
@@ -177,7 +195,10 @@
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="#section-all-functions">All functions</a></li>
+      <li><a href="#section-aggregating-data">Aggregating data</a></li>
+      <li><a href="#section-manipulating-eyetracking-data">Manipulating eyetracking data</a></li>
+      <li><a href="#section-miscellany">Miscellany</a></li>
+      <li><a href="#section-little-listeners-project">Little Listeners project</a></li>
     </ul>
   </div>
 </div>
