@@ -30,13 +30,19 @@ aggregate_looks <- function(data, resp_def, formula) {
 #' @return a list
 #' @export
 #' @rdname response-definition
-create_response_def <- function(primary, others, elsewhere = NULL, missing = NA) {
-  list(
+create_response_def <- function(primary, others, elsewhere = NULL, missing = NA, id = NULL) {
+  structure(list(
+    response_def = id %||% paste0(primary, collapse = "-"),
     primary = primary,
     others = others,
     elsewhere = elsewhere,
     missing = missing
-  )
+  ), class = "response_def")
+}
+
+
+print.response_def <- function(object, ...) {
+  str(object, ...)
 }
 
 #' Alternative function for aggregating looks
@@ -50,6 +56,28 @@ create_response_def <- function(primary, others, elsewhere = NULL, missing = NA)
 #' @export
 aggregate_looks2 <- function(data, resp_def, resp_var, ...) {
   grouping <- quos(...)
+  resp_var <- enquo(resp_var)
+
+  # Tuck a single definition in a list
+  if (class(resp_def) == "response_def") {
+    resp_def <- list(resp_def)
+  }
+
+  stopifnot(vapply(resp_def, class, "class") == "response_def")
+
+  # Process all definitions in the list
+  x <- list_along(resp_def)
+  for (def in seq_along(resp_def)) {
+    x[[def]] <- .aggregate_looks2(data, resp_def[[def]],
+                                  !! resp_var, !!! grouping)
+  }
+
+  bind_rows(x)
+}
+
+# workhorse function for a single aggregation
+.aggregate_looks2 <- function(data, resp_def, resp_var, ...) {
+  grouping <- quos(...)
   grouping_data <- data %>% distinct(!!! grouping)
   resp_var <- enquo(resp_var)
 
@@ -59,7 +87,7 @@ aggregate_looks2 <- function(data, resp_def, resp_var, ...) {
 
   # Check that a grouping column name doesn't show up as a gaze column name
   reserved_name <- c(with_na_label(resp_vals), "Others", "Elsewhere",
-                     "Prop", "PropSE", "PropMissing")
+                     "Prop", "PropSE", "PropMissing", ".response_def")
 
   if (any(grouping %in% reserved_name)) {
     group_names <- names(grouping_data)
@@ -101,11 +129,28 @@ aggregate_looks2 <- function(data, resp_def, resp_var, ...) {
   looks <- sym("Looks")
 
   data_wide %>%
-    mutate(Looks = UQ(primary) + UQ(others) + UQ(elsewhere) + UQ(missing),
-           Prop = UQ(primary) / (UQ(others) + UQ(primary)),
-           PropSE = se_prop(UQ(prop), UQ(others) + UQ(primary)),
-           PropNA = UQ(missing) / UQ(looks))
+    mutate(
+      .response_def = resp_def$response_def,
+      Looks = UQ(primary) + UQ(others) + UQ(elsewhere) + UQ(missing),
+      Prop = UQ(primary) / (UQ(others) + UQ(primary)),
+      PropSE = se_prop(UQ(prop), UQ(others) + UQ(primary)),
+      PropNA = UQ(missing) / UQ(looks)) %>%
+    select(.response_def, everything())
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 check_resp_def <- function(resp_def, observed_resp_vals) {

@@ -60,7 +60,7 @@ frames <- tidyr::crossing(
 
 frames <- frames %>% 
   rowwise() %>% 
-  mutate(GazeByTarget = sample(x = unlist(response_def), 1, prob = c(PTarget, PDist, PDist, PNA))) %>% 
+  mutate(GazeByTarget = sample(x = unlist(response_def[-1]), 1, prob = c(PTarget, PDist, PDist, PNA))) %>% 
   ungroup() %>% 
   select(-PTarget, -PElse, -PDist, -PNA)
 
@@ -89,7 +89,7 @@ four_image_data <- tidyr::crossing(
   Time = -20:20 * 50)
 
 four_image_data$GazeByTarget <- sample(
-  x = unlist(four_image_def),
+  x = unlist(four_image_def[-1]),
   size = nrow(four_image_data),
   replace = TRUE,
   prob = c(.35, .05, .075, .175, .05, .15))
@@ -177,6 +177,33 @@ four_image_def <- create_response_def(
 
 aggregate_looks(four_image_data, four_image_def, Subject ~ GazeByTarget)
 ```
+
+Including multiple aggreations at once.
+
+```{r}
+to_foila <- create_response_def(
+  primary = c("FoilA"),
+  others = c("Target", "FoilB", "Competitor"),
+  elsewhere = c("tracked"),
+  missing = c(NA),
+  id = "To Foil A"
+)
+
+to_foilb <- create_response_def(
+  primary = c("FoilB"),
+  others = c("Target", "FoilA", "Competitor"),
+  elsewhere = c("tracked"),
+  missing = c(NA),
+  id = "To Foil B"
+)
+
+defs <- list(to_foila, to_foilb)
+
+
+aggregate_looks(four_image_data, defs, Subject ~ GazeByTarget)
+
+```
+
 
 ### others
 

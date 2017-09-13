@@ -15,7 +15,7 @@ test_that("aggregate_looks works like lookr::AggregateLooks", {
     Time = 1:4)
 
   data$GazeByImageAOI <- sample(
-    x = unlist(lookr_def),
+    x = unlist(lookr_def[-1]),
     size = nrow(data),
     replace = TRUE,
     prob = c(.6, .2, .05, .15))
@@ -59,7 +59,7 @@ test_that("aggregate_looks2", {
     Time = 1:4)
 
   data$GazeByImageAOI <- sample(
-    x = unlist(four_img_def),
+    x = unlist(four_img_def[-1]),
     size = nrow(data),
     replace = TRUE,
     prob = c(.4, .1, .1, 1, .05, .15))
