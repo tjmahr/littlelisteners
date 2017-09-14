@@ -71,11 +71,10 @@
     
     
 <div class="contents">
-<p>Consider data from a Visual World style experiment. On each trial, an array of images appears. For example:</p>
+<p>Let’s consider some word recognition eyetracking data from a Visual World style experiment. On each trial, an array of images appears. For example:</p>
 <p><img src="figure-html/four-image-screen.png" width="70%"></p>
-<p>The listener hears a prompt to view one of images: <em>Find the bell</em>.</p>
-<p>Among these images is a target (here, <em>bell</em>), a phonological competitor (<em>bee</em>), a semantic competitor (<em>drum</em>), and an unrelated word (<em>swing</em>).</p>
-<p>We have some eyetracking data from this experiment for one participant:</p>
+<p>Among these images is a target (here, <em>bell</em>), a phonological competitor (<em>bee</em>), a semantic competitor (<em>drum</em>), and an unrelated word (<em>swing</em>). The listener hears a prompt to view one of images: <em>Find the bell</em>. The operative experimental question is how does the probability of fixating on the named image change over time.</p>
+<p>The package provides some example eyetracking data from this experiment for one participant. Each row is a sample from an eyetracker running at a rate of 60 Hz (60 frames per second). <code>Time</code> is in milliseconds. We have already mapped the <em>x</em>-<em>y</em> gaze coordinates onto screen locations. These gaze locations are coded in the <code>GazeByImageAOI</code> column as looks to the <code>"Target"</code>, <code>"PhonologicalFoil"</code>, <code>"SemanticFoil"</code>, or <code>"Unrelated"</code> images, or as <code>"tracked"</code> (ambiguous/intermediate location) or <code>NA</code> (offscreen or missing).</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(littlelisteners)
 <span class="kw">library</span>(dplyr, <span class="dt">warn.conflicts =</span> <span class="ot">FALSE</span>)
 <span class="co">#&gt; Warning: package 'dplyr' was built under R version 3.4.1</span>
@@ -102,7 +101,6 @@ four_image_data
 <span class="co">#&gt; #   UpperLeftImageStimulus &lt;chr&gt;, UpperRightImageStimulus &lt;chr&gt;,</span>
 <span class="co">#&gt; #   LowerRightImageStimulus &lt;chr&gt;, LowerLeftImageStimulus &lt;chr&gt;,</span>
 <span class="co">#&gt; #   TargetOnset &lt;int&gt;</span></code></pre></div>
-<p>The gazes are coded in the <code>GazeByImageAOI</code> column as looks to the <code>"Target"</code>, <code>"PhonologicalFoil"</code>, <code>"SemanticFoil"</code>, or <code>"Unrelated"</code> images, or as <code>"tracked"</code> (ambiguous/intermediate location) or <code>NA</code> (offscreen or missing).</p>
 <div id="response-definitions" class="section level2">
 <h2 class="hasAnchor">
 <a href="#response-definitions" class="anchor"></a>Response definitions</h2>
@@ -113,7 +111,7 @@ four_image_data
 <li>Elsewhere looks: A gaze that is onscreen but not a primary or other response. Typically, this occurs when the participant is shifting between images.</li>
 <li>Missing looks: A missing or offscreen gaze.</li>
 </ul>
-<p>A <em>response definition</em> is a programmatic way of describing these response types. In the code below, <code>response_def</code> is a response definition for the four-image experiment with a <code>"Target"</code> image and the three competing images lumped together in the <code>"Others"</code> <code>"Distractor"</code> and other looks are either <code>"tracked"</code> or missing (<code>NA</code>).</p>
+<p>A <em>response definition</em> is a programmatic way of describing these response types. In the code below, <code>response_def</code> is a response definition for the four-image experiment with a <code>"Target"</code> image and the three competing images lumped together in the <code>"Others"</code>, and other looks are either <code>"tracked"</code> or missing (<code>NA</code>).</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">response_def &lt;-<span class="st"> </span><span class="kw"><a href="../reference/response-definition.html">create_response_def</a></span>(
   <span class="dt">primary =</span> <span class="st">"Target"</span>,
   <span class="dt">others =</span> <span class="kw">c</span>(<span class="st">"PhonologicalFoil"</span>, <span class="st">"SemanticFoil"</span>, <span class="st">"Unrelated"</span>),
@@ -133,7 +131,7 @@ response_def
 <div id="aggregating-looks" class="section level2">
 <h2 class="hasAnchor">
 <a href="#aggregating-looks" class="anchor"></a>Aggregating looks</h2>
-<p>These response definitions allow us to aggregate looking data in a generic way. The function <code><a href="../reference/aggregating-looks.html">aggregate_looks()</a></code> counts the number of looks to each of the four response categories using an aggregation formula. For example, we can count looks by participant. There are several columns here, so we view <code>glimpse()</code> to look at some values from all of them.</p>
+<p>These response definitions allow us to aggregate looking data in a generic way. The function <code><a href="../reference/aggregating-looks.html">aggregate_looks()</a></code> counts the number of looks to each of the four response categories using an aggregation formula. For example, we can count looks by participant. There are several columns here, so we use <code>glimpse()</code> to look at some values from every column.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">four_image_data <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="kw"><a href="../reference/aggregating-looks.html">aggregate_looks</a></span>(response_def, Subject <span class="op">~</span><span class="st"> </span>GazeByImageAOI) <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">glimpse</span>()
@@ -172,7 +170,7 @@ response_def
 <span class="co">#&gt; # ... with 14 more rows, and 9 more variables: Unrelated &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   Elsewhere &lt;dbl&gt;, Missing &lt;dbl&gt;, Others &lt;dbl&gt;, Primary &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   Looks &lt;dbl&gt;, Prop &lt;dbl&gt;, PropSE &lt;dbl&gt;, PropNA &lt;dbl&gt;</span></code></pre></div>
-<p>We can also perform other kind of aggregations using different response definitions. For instance, we can compare image locations by writing a new response definition.</p>
+<p>We can also perform other kind of aggregations using different response definitions. For instance, we can compare image <em>locations</em> by writing a new response definition.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">location_def &lt;-<span class="st"> </span><span class="kw"><a href="../reference/response-definition.html">create_response_def</a></span>(
   <span class="dt">primary =</span> <span class="st">"LowerLeftImage"</span>,
   <span class="dt">others =</span> <span class="kw">c</span>(<span class="st">"UpperRightImage"</span>, <span class="st">"UpperLeftImage"</span>, <span class="st">"LowerRightImage"</span>),
@@ -198,7 +196,7 @@ response_def
 <span class="co">#&gt; $ Prop            &lt;dbl&gt; 0.249503</span>
 <span class="co">#&gt; $ PropSE          &lt;dbl&gt; 0.004113552</span>
 <span class="co">#&gt; $ PropNA          &lt;dbl&gt; 0.4132951</span></code></pre></div>
-<p>We can perform multiple aggreations at once. First, <code><a href="../reference/cycle_response_def.html">cycle_response_def()</a></code> can create a cycle of response definitions where each response acts as the primary outcome at least once.</p>
+<p>We can perform multiple aggregations at once. First, <code><a href="../reference/cycle_response_def.html">cycle_response_def()</a></code> can create a set of response definitions where each response acts as the primary outcome.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">all_defs &lt;-<span class="st"> </span><span class="kw"><a href="../reference/cycle_response_def.html">cycle_response_def</a></span>(response_def)
 all_defs
 <span class="co">#&gt; [[1]]</span>
@@ -236,7 +234,7 @@ all_defs
 <span class="co">#&gt;  $ elsewhere   : chr "tracked"</span>
 <span class="co">#&gt;  $ missing     : logi NA</span>
 <span class="co">#&gt;  - attr(*, "class")= chr "response_def"</span></code></pre></div>
-<p>When given a list of response definitions, <code><a href="../reference/aggregating-looks.html">aggregate_looks()</a></code> will compute the aggregation for each one.</p>
+<p>When given a list of response definitions, <code><a href="../reference/aggregating-looks.html">aggregate_looks()</a></code> does the right thing and computes the aggregation for each one.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">four_image_data <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="kw"><a href="../reference/aggregating-looks.html">aggregate_looks</a></span>(all_defs, Subject <span class="op">~</span><span class="st"> </span>GazeByImageAOI) <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">select</span>(<span class="dt">ResponseDef =</span> .response_def, Subject, Primary, 
@@ -295,7 +293,7 @@ all_defs
 <div id="growth-curve-analysis-is-aggregating-looks-over-time" class="section level2">
 <h2 class="hasAnchor">
 <a href="#growth-curve-analysis-is-aggregating-looks-over-time" class="anchor"></a>Growth curve analysis is aggregating looks over time</h2>
-<p>With <code><a href="../reference/aggregating-looks.html">aggregate_looks()</a></code>, we can estimate the growth curves of looking probabilities. First, for this data-set, we need to adjust the eyetracking timestamps so that time 0 occurs at target onset. We are also going to bin and downsample the eyetracking data to have an effective sampling rate of 10 frames per second.</p>
+<p>With <code><a href="../reference/aggregating-looks.html">aggregate_looks()</a></code>, we can estimate growth curves of looking probabilities. First, for this dataset, we need to adjust the eyetracking timestamps so that time 0 occurs at target onset. We are also going to bin and downsample the eyetracking data to have an effective sampling rate of 10 frames per second—just for plotting.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">growth_curves &lt;-<span class="st"> </span>four_image_data <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="kw"><a href="../reference/adjust_times.html">adjust_times</a></span>(Time, TargetOnset, Subject, BlockNo, TrialNo) <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">filter</span>(<span class="op">-</span><span class="dv">1005</span> <span class="op">&lt;=</span><span class="st"> </span>Time, Time <span class="op">&lt;=</span><span class="st"> </span><span class="dv">2000</span>) <span class="op">%&gt;%</span><span class="st"> </span>
