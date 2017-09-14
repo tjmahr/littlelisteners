@@ -2,7 +2,7 @@
 title: "Aggregating Eyetracking Data"
 author: "TJ Mahr"
 date: "`r Sys.Date()`"
-# output: rmarkdown::html_vignette
+output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Aggregating Eyetracking Data}
   %\VignetteEngine{knitr::rmarkdown}
@@ -13,30 +13,32 @@ vignette: >
 knitr::opts_chunk$set(comment = "#>", collapse = TRUE)
 ```
 
-Consider data from a Visual World style experiment. On each trial, an array of
-images appears. For example:
+Let's consider some word recognition eyetracking data from a Visual World style
+experiment. On each trial, an array of images appears. For example:
 
 ```{r sample-screen3, echo = FALSE, out.width = "70%"}
 knitr::include_graphics("figure-html/four-image-screen.png")
 ```
 
-The listener hears a prompt to view one of images: _Find the bell_.
+Among these images is a target (here, _bell_), a phonological competitor 
+(_bee_), a semantic competitor (_drum_), and an unrelated word (_swing_). The 
+listener hears a prompt to view one of images: _Find the bell_. The operative
+experimental question is how does the probability of fixating on the named image
+change over time.
 
-Among these images is a target (here, _bell_), a phonological competitor
-(_bee_), a semantic competitor (_drum_), and an unrelated word (_swing_).
-
-We have some eyetracking data from this experiment for one participant:
+The package provides some example eyetracking data from this experiment for one 
+participant. Each row is a sample from an eyetracker running at a rate of 60 Hz
+(60 frames per second). `Time` is in milliseconds. We have already mapped the
+_x_-_y_ gaze coordinates onto screen locations. These gaze locations are coded
+in the `GazeByImageAOI` column as looks to the `"Target"`, `"PhonologicalFoil"`,
+`"SemanticFoil"`, or `"Unrelated"` images, or as `"tracked"`
+(ambiguous/intermediate location) or `NA` (offscreen or missing).
 
 ```{r}
 library(littlelisteners)
 library(dplyr, warn.conflicts = FALSE)
 four_image_data
 ```
-
-The gazes are coded in the `GazeByImageAOI` column as looks to the `"Target"`,
-`"PhonologicalFoil"`, `"SemanticFoil"`, or `"Unrelated"` images, or as
-`"tracked"` (ambiguous/intermediate location) or `NA` (offscreen or missing).
-
 
 ## Response definitions
 
@@ -53,7 +55,7 @@ eyetracking responses. We assume that there are four basic gaze types.
 A _response definition_ is a programmatic way of describing these response
 types. In the code below, `response_def` is a response definition for the
 four-image experiment with a `"Target"` image and the three competing images
-lumped together in the `"Others"` `"Distractor"` and other looks are either
+lumped together in the `"Others"`, and other looks are either
 `"tracked"` or missing (`NA`).
 
 ```{r}
@@ -72,8 +74,8 @@ response_def
 These response definitions allow us to aggregate looking data in a generic way.
 The function `aggregate_looks()` counts the number of looks to each of the four
 response categories using an aggregation formula. For example, we can count
-looks by participant. There are several columns here, so we view `glimpse()` 
-to look at some values from all of them.
+looks by participant. There are several columns here, so we use `glimpse()` 
+to look at some values from every column.
 
 ```{r}
 four_image_data %>% 
@@ -89,7 +91,7 @@ four_image_data %>%
 ```
 
 We can also perform other kind of aggregations using different response
-definitions. For instance, we can compare image locations by writing a new
+definitions. For instance, we can compare image _locations_ by writing a new
 response definition.
 
 ```{r}
@@ -104,17 +106,17 @@ aggregate_looks(four_image_data, location_def, Subject ~ GazeByAOI) %>%
   glimpse()
 ```
 
-We can perform multiple aggreations at once. First, `cycle_response_def()` can
-create a cycle of response definitions where each response acts as the primary
-outcome at least once.
+We can perform multiple aggregations at once. First, `cycle_response_def()` can
+create a set of response definitions where each response acts as the primary
+outcome.
 
 ```{r}
 all_defs <- cycle_response_def(response_def)
 all_defs
 ```
 
-When given a list of response definitions, `aggregate_looks()` will compute the
-aggregation for each one.
+When given a list of response definitions, `aggregate_looks()` does the right
+thing and computes the aggregation for each one.
 
 ```{r}
 four_image_data %>% 
@@ -126,11 +128,11 @@ four_image_data %>%
 
 ## Growth curve analysis is aggregating looks over time
 
-With `aggregate_looks()`, we can estimate the growth curves of looking
-probabilities. First, for this data-set, we need to adjust the eyetracking
+With `aggregate_looks()`, we can estimate growth curves of looking
+probabilities. First, for this dataset, we need to adjust the eyetracking
 timestamps so that time 0 occurs at target onset. We are also going to bin and
 downsample the eyetracking data to have an effective sampling rate of 10 frames
-per second.
+per second---just for plotting.
 
 ```{r}
 growth_curves <- four_image_data %>% 
@@ -163,7 +165,3 @@ ggplot(growth_curves) +
        x = "Time relative to target onset [ms]",
        color = "Image")
 ```
-
-
-
-

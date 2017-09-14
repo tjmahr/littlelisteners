@@ -19,3 +19,16 @@ empirical_logit_weight <- function(x, y) {
   var2 <- 1 / (y + 0.5)
   var1 + var2
 }
+
+#' Standard error for proportions
+#'
+#' See http://www.r-tutor.com/elementary-statistics/interval-estimation/interval-estimate-population-proportion
+#' @param proportion proportions of hits
+#' @param n_possible numbers of total events
+#' @return the standard errors of the proportion estimates
+#' @export
+se_prop <- function(proportion, n_possible) {
+  spread <- proportion * (1 - proportion)
+  sqrt(spread / n_possible)
+}
+

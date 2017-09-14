@@ -17,6 +17,7 @@ reference:
       Utility functions
     contents:
       - empirical_logit
+      - se_prop
   - title: "Little Listeners project"
     desc: >
       These functions apply only to data collected for the

@@ -261,19 +261,6 @@ aggregate_looks2 <- function(data, resp_def, resp_var, ...) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 check_resp_def <- function(resp_def, observed_resp_vals) {
   possible_resp_vals <- unlist(resp_def)
   missing <- setdiff(observed_resp_vals, possible_resp_vals)
@@ -308,7 +295,4 @@ maybe_row_sums <- function(df, col_names) {
   }
 }
 
-se_prop <- function(proportion, n_possible) {
-  spread <- proportion * (1 - proportion)
-  sqrt(spread / n_possible)
-}
+
