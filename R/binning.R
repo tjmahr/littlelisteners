@@ -14,7 +14,8 @@
 #' @return the original dataframe with an added column of bin numbers. The
 #'   dataframe will be sorted by the grouping and time variables.
 #' @export
-assign_bins <- function(data, bin_width = 3, time_var, ..., bin_col = ".bin", na_location = "tail", partial = FALSE) {
+assign_bins <- function(data, bin_width = 3, time_var, ..., bin_col = ".bin",
+                        na_location = "tail", partial = FALSE) {
   dots <- quos(...)
   time_var <- enquo(time_var)
 
@@ -45,6 +46,165 @@ assign_bins <- function(data, bin_width = 3, time_var, ..., bin_col = ".bin", na
                                          na_location, partial)) %>%
     ungroup()
 }
+
+#' Truncate times to fit bin width
+#'
+#' Samples of eyetracking data are excluded so that the number of frames is
+#' evenly divisible by a given bin width. For example, given a bin width of 3
+#' frames, a trial with 181 frames would lose 1 frame.
+#'
+#' @inheritParams assign_bins
+#' @param key_time,key_position optional arguments controlling the trimming.
+#'   If used, the given time value (`key_time`) will have a specific
+#'   position within a bin (`key_position`). For example, given a value of 0 and
+#'   position of 2, the trimming will force the frame with time 0 to fall in the
+#'   second frame of its bin.
+#' @param min_time,max_time optional arguments controlling the trimming. If
+#'   used, the time values are filtered to whole bins of frames before
+#'   `min_time` and after `max_time`.
+#' @return the original dataframe with its time column trimmed to make it easier
+#'   to  bin time values into groups of `bin_width`.
+#' @export
+#' @examples
+#' data1 <- data_frame(
+#'   task = "testing",
+#'   id = "test1",
+#'   time = -4:6,
+#'   frame = seq_along(time))
+#'
+#' data2 <- data_frame(
+#'   task = "testing",
+#'   id = "test2",
+#'   time = -5:5,
+#'   frame = seq_along(time))
+#'
+#' # Number of rows per id is divisible by bin width
+#' bind_rows(data1, data2) %>%
+#'   trim_to_bin_width(3, time, id)
+#'
+#' # Now require time 0 to be center of its bin
+#' bind_rows(data1, data2) %>%
+#'   trim_to_bin_width(3, time, id, key_time = 0, key_position = 2) %>%
+#'   assign_bins(3, time, id)
+#'
+#' # And require latest time in each bin to be >= some minimum time
+#' bind_rows(data1, data2) %>%
+#'   trim_to_bin_width(3, time, id, key_time = 0, key_position = 2,
+#'                     min_time = -1) %>%
+#'   assign_bins(3, time, id)
+#'
+#' # And require earliest time in each bin to be <= some maximum time
+#' bind_rows(data1, data2) %>%
+#'   trim_to_bin_width(3, time, id, key_time = 0, key_position = 2,
+#'                     min_time = -1, max_time = 4) %>%
+#'   assign_bins(3, time, id)
+trim_to_bin_width <- function(data, bin_width = 3, time_var, ...,
+                              key_time = NULL, key_position = 1,
+                              min_time = NULL, max_time = NULL) {
+  dots <- quos(...)
+  time_var <- enquo(time_var)
+
+  minimal_vars <- c(dots, time_var)
+  minimal_data <- data %>% distinct(!!! minimal_vars)
+
+  if (nrow(data) != nrow(minimal_data)) {
+    names <- as.character(lapply(dots, f_rhs))
+    msg <- paste0(
+      "Grouping variables do not uniquely specify data: \n  Groups: ",
+      expr_text(names),
+      "\n  Are you missing a grouping variable?")
+
+    stop(call. = FALSE, msg)
+  }
+
+  data %>%
+    group_by(!!! dots) %>%
+    dplyr::filter(
+      determine_frame_trimming(!! time_var, bin_width, key_time,
+                               key_position, min_time, max_time)) %>%
+    ungroup()
+}
+
+
+
+determine_frame_trimming <- function(times, bin_width = 3, key_time = NULL,
+                                     key_position = NULL, min_time = NULL,
+                                     max_time = NULL) {
+  key_position <- key_position %||% 1
+
+  if (key_position > bin_width) {
+    warning("Key position ", key_position, " larger than bin width ",
+            bin_width, call. = FALSE)
+    key_position <- key_position %% bin_width
+    if (key_position == 0) key_position <- bin_width
+  }
+
+  raw_times <- times
+  times <- sort(times)
+
+  # Default to times that are one bin from edges
+  min_was_null <- is.null(min_time)
+  max_was_null <- is.null(max_time)
+  min_time <- min_time %||% times[bin_width + 1]
+  max_time <- max_time %||% times[length(times) - bin_width]
+
+  min_frame <- which.min(abs(times - min_time))
+  max_frame <- which.min(abs(times - max_time))
+
+  # Add a bin of slack on either side if possible.
+  if (min_frame > bin_width) {
+    min_frame <- min_frame - bin_width
+  }
+
+  if ((max_frame + bin_width) <= length(times)) {
+    max_frame <- max_frame + bin_width
+  }
+
+  trim_min_time <- times[min_frame]
+  trim_max_time <- times[max_frame]
+
+  curr_times <- times[seq(min_frame, max_frame)]
+
+  key_position <- key_position %||% 1
+  key_time <- key_time %||% min_time
+  key_frame <- which.min(abs(curr_times - key_time))
+
+  # Repeat frame positions from the key frame
+  kernel <- key_frame + (seq_len(bin_width) - key_position)
+
+  # Reverse in order to repeat to the left
+  until_kernel <- seq_len(min(kernel) - 1)
+  first_half <- rev(rep_along(until_kernel, rev(kernel)))
+
+  # Repeat to the right
+  until_end <- seq(min(kernel), length(curr_times))
+  other_half <- rep_along(until_end, kernel)
+
+  kernel_long <- c(first_half, other_half)
+
+  trimmed <- data_frame(frame_times = curr_times,
+                        frames = seq_along(frame_times),
+                        bins = .data$frames - kernel_long) %>%
+    group_by(.data$bins) %>%
+    mutate(n_frames = n(),
+           frames_in_bin = seq_len(n()),
+           right_size = .data$n_frames == bin_width,
+           after_min = min_was_null | max(.data$frame_times) > min_time,
+           before_max = max_was_null | min(.data$frame_times) < max_time) %>%
+    ungroup() %>%
+    filter(.data$right_size, .data$after_min, .data$before_max)
+
+  trimmed_times <- trimmed %>% pull(.data$frame_times)
+  key_time_frame <- which.min(abs(trimmed_times - key_time))
+  stopifnot(
+    key_time_frame %% bin_width == key_position %% bin_width,
+    length(trimmed_times) %% bin_width == 0)
+
+  raw_times %in% trimmed_times
+}
+
+
+
 
 #' Assign bin numbers to a vector
 #'

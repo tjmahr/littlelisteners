@@ -12,6 +12,8 @@ reference:
       Functions for manipulating eyetracking data
     contents:
       - adjust_times
+      - assign_bins
+      - trim_to_bin_width
   - title: "Miscellany"
     desc: >
       Utility functions

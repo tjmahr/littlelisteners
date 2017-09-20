@@ -65,7 +65,7 @@
       <h1>Aggregating Eyetracking Data</h1>
                         <h4 class="author">TJ Mahr</h4>
             
-            <h4 class="date">2017-09-13</h4>
+            <h4 class="date">2017-09-20</h4>
           </div>
 
     
@@ -77,7 +77,6 @@
 <p>The package provides some example eyetracking data from this experiment for one participant. Each row is a sample from an eyetracker running at a rate of 60 Hz (60 frames per second). <code>Time</code> is in milliseconds. We have already mapped the <em>x</em>-<em>y</em> gaze coordinates onto screen locations. These gaze locations are coded in the <code>GazeByImageAOI</code> column as looks to the <code>"Target"</code>, <code>"PhonologicalFoil"</code>, <code>"SemanticFoil"</code>, or <code>"Unrelated"</code> images, or as <code>"tracked"</code> (ambiguous/intermediate location) or <code>NA</code> (offscreen or missing).</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(littlelisteners)
 <span class="kw">library</span>(dplyr, <span class="dt">warn.conflicts =</span> <span class="ot">FALSE</span>)
-<span class="co">#&gt; Warning: package 'dplyr' was built under R version 3.4.1</span>
 four_image_data
 <span class="co">#&gt; # A tibble: 20,910 x 25</span>
 <span class="co">#&gt;    Subject BlockNo  Time GazeByAOI GazeByImageAOI  TargetLocation</span>
@@ -323,7 +322,6 @@ all_defs
 <span class="co">#&gt; #   Looks &lt;dbl&gt;, Prop &lt;dbl&gt;, PropSE &lt;dbl&gt;, PropNA &lt;dbl&gt;</span></code></pre></div>
 <p>We can plot these growth curves.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(ggplot2)
-<span class="co">#&gt; Warning: package 'ggplot2' was built under R version 3.4.1</span>
 <span class="kw">ggplot</span>(growth_curves) <span class="op">+</span>
 <span class="st">  </span><span class="kw">aes</span>(<span class="dt">x =</span> Time, <span class="dt">y =</span> Prop, <span class="dt">color =</span> .response_def) <span class="op">+</span>
 <span class="st">  </span><span class="kw">geom_hline</span>(<span class="dt">size =</span> <span class="dv">2</span>, <span class="dt">color =</span> <span class="st">"white"</span>, <span class="dt">yintercept =</span> .<span class="dv">25</span>) <span class="op">+</span>
