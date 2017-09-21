@@ -4,26 +4,26 @@
 \alias{trim_to_bin_width}
 \title{Truncate times to fit bin width}
 \usage{
-trim_to_bin_width(data, bin_width = 3, time_var, ..., key_time = NULL,
-  key_position = 1, min_time = NULL, max_time = NULL)
+trim_to_bin_width(data, bin_width = 3, key_time = NULL, key_position = 1,
+  time_var, ..., min_time = NULL, max_time = NULL)
 }
 \arguments{
 \item{data}{a dataframe of looking data}
 
 \item{bin_width}{the number of items to put in each bin. Default is 3.}
 
+\item{key_time, key_position}{arguments controlling the trimming. The given
+time value (\code{key_time}) will have a specific position within a bin
+(\code{key_position}). For example, given a value of 0 and position of 2, the
+trimming will force the frame with time 0 to fall in the second frame of
+its bin.}
+
 \item{time_var}{the name of the column representing time}
 
 \item{...}{grouping variables}
 
-\item{key_time, key_position}{optional arguments controlling the trimming.
-If used, the given time value (\code{key_time}) will have a specific
-position within a bin (\code{key_position}). For example, given a value of 0 and
-position of 2, the trimming will force the frame with time 0 to fall in the
-second frame of its bin.}
-
 \item{min_time, max_time}{optional arguments controlling the trimming. If
-used, the time values are filtered to whole bins of frames before
+used, the time values are filtered to exclude whole bins of frames before
 \code{min_time} and after \code{max_time}.}
 }
 \value{
@@ -33,7 +33,10 @@ to  bin time values into groups of \code{bin_width}.
 \description{
 Samples of eyetracking data are excluded so that the number of frames is
 evenly divisible by a given bin width. For example, given a bin width of 3
-frames, a trial with 181 frames would lose 1 frame.
+frames, a trial with 181 frames would lose 1 frame. The frames aligned so
+that a key time value have a specific position in a bin. For example, setting
+time 0 to position 1 will truncate the times so that time 0 will be the first
+frame inside of its bin.
 }
 \examples{
 data1 <- data_frame(
@@ -49,23 +52,22 @@ data2 <- data_frame(
   frame = seq_along(time))
 
 # Number of rows per id is divisible by bin width
+# and time 0 is center of its bin
 bind_rows(data1, data2) \%>\%
-  trim_to_bin_width(3, time, id)
+  trim_to_bin_width(3, key_time = 0, key_position = 2, time, id) \%>\%
+  assign_bins(3, time, id) \%>\%
+  group_by(id, .bin) \%>\%
+  dplyr::mutate(center_time = median(time))
 
-# Now require time 0 to be center of its bin
+# And exclude times in bins before some minimum time
 bind_rows(data1, data2) \%>\%
-  trim_to_bin_width(3, time, id, key_time = 0, key_position = 2) \%>\%
-  assign_bins(3, time, id)
-
-# And require latest time in each bin to be >= some minimum time
-bind_rows(data1, data2) \%>\%
-  trim_to_bin_width(3, time, id, key_time = 0, key_position = 2,
+  trim_to_bin_width(3, key_time = 0, key_position = 2, time, id,
                     min_time = -1) \%>\%
   assign_bins(3, time, id)
 
-# And require earliest time in each bin to be <= some maximum time
+# And exclude times in bins after some maximum time
 bind_rows(data1, data2) \%>\%
-  trim_to_bin_width(3, time, id, key_time = 0, key_position = 2,
+  trim_to_bin_width(3, key_time = 0, key_position = 2, time, id,
                     min_time = -1, max_time = 4) \%>\%
   assign_bins(3, time, id)
 }

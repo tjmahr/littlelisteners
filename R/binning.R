@@ -51,16 +51,19 @@ assign_bins <- function(data, bin_width = 3, time_var, ..., bin_col = ".bin",
 #'
 #' Samples of eyetracking data are excluded so that the number of frames is
 #' evenly divisible by a given bin width. For example, given a bin width of 3
-#' frames, a trial with 181 frames would lose 1 frame.
+#' frames, a trial with 181 frames would lose 1 frame. The frames aligned so
+#' that a key time value have a specific position in a bin. For example, setting
+#' time 0 to position 1 will truncate the times so that time 0 will be the first
+#' frame inside of its bin.
 #'
 #' @inheritParams assign_bins
-#' @param key_time,key_position optional arguments controlling the trimming.
-#'   If used, the given time value (`key_time`) will have a specific
-#'   position within a bin (`key_position`). For example, given a value of 0 and
-#'   position of 2, the trimming will force the frame with time 0 to fall in the
-#'   second frame of its bin.
+#' @param key_time,key_position arguments controlling the trimming. The given
+#'   time value (`key_time`) will have a specific position within a bin
+#'   (`key_position`). For example, given a value of 0 and position of 2, the
+#'   trimming will force the frame with time 0 to fall in the second frame of
+#'   its bin.
 #' @param min_time,max_time optional arguments controlling the trimming. If
-#'   used, the time values are filtered to whole bins of frames before
+#'   used, the time values are filtered to exclude whole bins of frames before
 #'   `min_time` and after `max_time`.
 #' @return the original dataframe with its time column trimmed to make it easier
 #'   to  bin time values into groups of `bin_width`.
@@ -79,28 +82,28 @@ assign_bins <- function(data, bin_width = 3, time_var, ..., bin_col = ".bin",
 #'   frame = seq_along(time))
 #'
 #' # Number of rows per id is divisible by bin width
+#' # and time 0 is center of its bin
 #' bind_rows(data1, data2) %>%
-#'   trim_to_bin_width(3, time, id)
+#'   trim_to_bin_width(3, key_time = 0, key_position = 2, time, id) %>%
+#'   assign_bins(3, time, id) %>%
+#'   group_by(id, .bin) %>%
+#'   dplyr::mutate(center_time = median(time))
 #'
-#' # Now require time 0 to be center of its bin
+#' # And exclude times in bins before some minimum time
 #' bind_rows(data1, data2) %>%
-#'   trim_to_bin_width(3, time, id, key_time = 0, key_position = 2) %>%
-#'   assign_bins(3, time, id)
-#'
-#' # And require latest time in each bin to be >= some minimum time
-#' bind_rows(data1, data2) %>%
-#'   trim_to_bin_width(3, time, id, key_time = 0, key_position = 2,
+#'   trim_to_bin_width(3, key_time = 0, key_position = 2, time, id,
 #'                     min_time = -1) %>%
 #'   assign_bins(3, time, id)
 #'
-#' # And require earliest time in each bin to be <= some maximum time
+#' # And exclude times in bins after some maximum time
 #' bind_rows(data1, data2) %>%
-#'   trim_to_bin_width(3, time, id, key_time = 0, key_position = 2,
+#'   trim_to_bin_width(3, key_time = 0, key_position = 2, time, id,
 #'                     min_time = -1, max_time = 4) %>%
 #'   assign_bins(3, time, id)
-trim_to_bin_width <- function(data, bin_width = 3, time_var, ...,
-                              key_time = NULL, key_position = 1,
+trim_to_bin_width <- function(data, bin_width = 3, key_time = NULL,
+                              key_position = 1, time_var, ...,
                               min_time = NULL, max_time = NULL) {
+  stopifnot(!is.null(key_time))
   dots <- quos(...)
   time_var <- enquo(time_var)
 
@@ -117,12 +120,37 @@ trim_to_bin_width <- function(data, bin_width = 3, time_var, ...,
     stop(call. = FALSE, msg)
   }
 
+  # # Fast alternative: Do all the times without grouping
+  # if (!is.null(min_time) & !is.null(max_time)) {
+  #   minimal_data %>%
+  #     group_by(!!! dots) %>%
+  #     summarise(.min_time = min(!! time_var),
+  #               .max_time = max(!! time_var)) %>%
+  #     ungroup() %>%
+  #     summarise()
+  #
+  #   time_values <- data %>%
+  #     pull(!! time_var) %>%
+  #     unique() %>%
+  #     sort()
+  #
+  #   to_keep <- time_values %>%
+  #     determine_frame_trimming(bin_width, key_time, key_position,
+  #                              min_time, max_time)
+  #   times_to_keep <- range(time_values[to_keep])
+  #
+  #   data %>%
+  #     filter(between(UQ(time_var), times_to_keep[1], times_to_keep[2]))
+  # } else {
   data %>%
     group_by(!!! dots) %>%
     dplyr::filter(
       determine_frame_trimming(!! time_var, bin_width, key_time,
                                key_position, min_time, max_time)) %>%
     ungroup()
+  # }
+
+
 }
 
 
