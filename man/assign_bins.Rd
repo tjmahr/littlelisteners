@@ -4,8 +4,15 @@
 \alias{assign_bins}
 \title{Assign bins for downsampling looking data}
 \usage{
-assign_bins(data, bin_width = 3, time_var, ..., bin_col = ".bin",
-  na_location = "tail", partial = FALSE)
+assign_bins(
+  data,
+  bin_width = 3,
+  time_var,
+  ...,
+  bin_col = ".bin",
+  na_location = "tail",
+  partial = FALSE
+)
 }
 \arguments{
 \item{data}{a dataframe of looking data}

@@ -4,8 +4,15 @@
 \alias{adjust_times}
 \title{Adjust looking times relative to some event}
 \usage{
-adjust_times(data, time_var = Time, event_var = NULL, ..., align = TRUE,
-  fps = 60, ties = "first")
+adjust_times(
+  data,
+  time_var = Time,
+  event_var = NULL,
+  ...,
+  align = TRUE,
+  fps = 60,
+  ties = "first"
+)
 }
 \arguments{
 \item{data}{a long data frame of looking data}

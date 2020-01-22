@@ -4,8 +4,16 @@
 \alias{trim_to_bin_width}
 \title{Truncate times to fit bin width}
 \usage{
-trim_to_bin_width(data, bin_width = 3, key_time = NULL, key_position = 1,
-  time_var, ..., min_time = NULL, max_time = NULL)
+trim_to_bin_width(
+  data,
+  bin_width = 3,
+  key_time = NULL,
+  key_position = 1,
+  time_var,
+  ...,
+  min_time = NULL,
+  max_time = NULL
+)
 }
 \arguments{
 \item{data}{a dataframe of looking data}

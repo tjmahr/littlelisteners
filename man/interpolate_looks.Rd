@@ -4,8 +4,15 @@
 \alias{interpolate_looks}
 \title{AOI-based gaze interpolation}
 \usage{
-interpolate_looks(x, window, fps, response_col, interp_col, fillable,
-  missing_looks)
+interpolate_looks(
+  x,
+  window,
+  fps,
+  response_col,
+  interp_col,
+  fillable,
+  missing_looks
+)
 }
 \arguments{
 \item{x}{a dataframe of grouped eyetracking data. Each row should be a single
@@ -32,7 +39,7 @@ These would typically be AOI locations.}
 \description{
 Fills in windows of missing data if the same AOI is fixated at
 beginning and end of the missing data window. For example, the sequence
-\code{"Target", NA, NA, "Target"} would be interpolated to be \code{"Target", "Target", "Target", "Target"}.
+\verb{"Target", NA, NA, "Target"} would be interpolated to be \verb{"Target", "Target", "Target", "Target"}.
 }
 \details{
 Use \code{window} to constrain the duration of missing data windows that

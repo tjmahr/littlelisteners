@@ -1,5 +1,20 @@
 
-
+#' Map the x and y positions of looks to Areas of Interest.
+#'
+#' @param x a dataframe of looking data
+#' @param aois an AOI or list of AOIs
+#' @param default_onscreen default label to use for a look onscreen that does
+#'   not fall into an AOI. Default is `"tracked"`
+#' @return an updated dataframe
+#'
+#' @details
+#' The function current assumes the conventions used in our lab. It will create
+#' a column called `GazeByAOI` with the label of the AOI for each look. It does
+#' this by checking whether the columns `XMean` and `YMean` fall into to the
+#' boundaries of the AOI.
+#'
+#' Offscreen looks receive `NA`.
+#'
 #' @export
 add_aois <- function(x, aois, default_onscreen = "tracked") {
   # Assign default non-missing AOI
@@ -35,6 +50,18 @@ check_looks_in_bounds <- function(xs, lower_bound, upper_bound) {
 }
 
 
+#' Create an AOI object
+#'
+#' Create an object representing an Area of Interest (AOI). Only rectangles are
+#' supported (like a jpeg image in an experiment). Pixel (0,0) is the lower left
+#' corner of the screen.
+#'
+#' @param aoi_name label of the AOI
+#' @param x_pix location of the left and right edges in pixels.
+#' @param y_pix location of the bottom and top edges in pixels.
+#' @param screen_width width of the screen in pixels. Defaults to 1920.
+#' @param screen_height width of the screen in pixels. Defaults to 1080.
+#' @return an AOI object.
 #' @export
 create_aoi <- function(aoi_name, x_pix, y_pix, screen_width = 1920, screen_height = 1080) {
   left_prop <- min(x_pix) / screen_width

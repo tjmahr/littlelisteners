@@ -8,10 +8,11 @@ Depends:
     R (>= 3.2.3)
 License: MIT + file LICENSE
 LazyData: true
-RoxygenNote: 6.0.1.9000
+RoxygenNote: 7.0.2
 Imports: dplyr,
     ggplot2,
     readr,
     stringr,
     tidyr
 Roxygen: list(markdown = TRUE)
+Encoding: UTF-8

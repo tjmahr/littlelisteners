@@ -11,9 +11,12 @@ reference:
     desc: >
       Functions for manipulating eyetracking data
     contents:
+      - create_aoi
+      - add_aois
       - adjust_times
       - assign_bins
       - trim_to_bin_width
+      - interpolate_looks
   - title: "Miscellany"
     desc: >
       Utility functions

@@ -4,8 +4,13 @@
 \alias{create_response_def}
 \title{Create a response definition}
 \usage{
-create_response_def(primary, others, elsewhere = NULL, missing = NA,
-  label = NULL)
+create_response_def(
+  primary,
+  others,
+  elsewhere = NULL,
+  missing = NA,
+  label = NULL
+)
 }
 \arguments{
 \item{primary}{the primary response of interest}

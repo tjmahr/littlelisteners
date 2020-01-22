@@ -3,7 +3,6 @@
 \docType{package}
 \name{littlelisteners}
 \alias{littlelisteners}
-\alias{littlelisteners-package}
 \title{littlelisteners.}
 \description{
 littlelisteners.

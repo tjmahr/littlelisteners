@@ -4,8 +4,12 @@
 \alias{read_gazedata}
 \title{Load a \code{.gazedata} file for an experiment}
 \usage{
-read_gazedata(gazedata_path, eyes = "both", means_need_both = FALSE,
-  apply_corrections = TRUE)
+read_gazedata(
+  gazedata_path,
+  eyes = "both",
+  means_need_both = FALSE,
+  apply_corrections = TRUE
+)
 }
 \arguments{
 \item{gazedata_path}{path to the \code{.gazedata} file that is to be parsed.}
