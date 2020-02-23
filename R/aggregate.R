@@ -279,11 +279,11 @@ with_na_label <- function(xs, na_label = "<NA>") {
 }
 
 drop_one_of <- function(.data, vars) {
-  matches <- intersect(colnames(.data), vars)
-  if (length(matches) != 0) {
-    .data <- select(.data, -one_of(matches))
-  }
-  .data
+  to_keep <- tidyselect::vars_select(
+    colnames(.data),
+    -tidyselect::any_of(vars)
+  )
+  .data[c(to_keep)]
 }
 
 maybe_row_sums <- function(df, col_names) {
@@ -294,5 +294,4 @@ maybe_row_sums <- function(df, col_names) {
     rowSums(df[matches])
   }
 }
-
 
