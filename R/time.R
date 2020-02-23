@@ -2,13 +2,15 @@
 find_frequent_interval <- function(xs, min_freq = .80) {
   df <- data_frame(x = xs)
   most_frequent_values <- df %>%
-    filter_(~ !is.na(x)) %>%
-    count_(~ x) %>%
-    mutate_(frequency = ~ n / max(n)) %>%
-    filter_(~ min_freq <= frequency)
+    filter(!is.na(.data$x)) %>%
+    count(.data$x) %>%
+    mutate(frequency = .data$n / max(.data$n)) %>%
+    filter(min_freq <= .data$frequency)
 
-  list(lower = min(most_frequent_values$x),
-       upper = max(most_frequent_values$x))
+  list(
+    lower = min(most_frequent_values$x),
+    upper = max(most_frequent_values$x)
+  )
 }
 
 #' Adjust looking times relative to some event
@@ -83,11 +85,15 @@ adjust_times_around_zero <- function(x, time_col = "Time", fps = 60, ties = "fir
          "  Grouping variables should select a single eyetracking trial.")
   }
 
-  do_(x, ~ adjust_times_around_zero_one(
-    x = .,
-    time_col = time_col,
-    fps = fps,
-    ties = ties))
+  dplyr::group_modify(
+    x,
+    ~ adjust_times_around_zero_one(
+      x = .,
+      time_col = time_col,
+      fps = fps,
+      ties = ties
+    )
+  )
 }
 
 
