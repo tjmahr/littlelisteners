@@ -75,6 +75,7 @@ correct_distances <- function(gaze) {
 #' @references \href{http://bit.ly/1AtKyhR}{Tobii Toolbox for Matlab: Product
 #'   Description & User Guide}
 #' @export
+#' @noMd
 read_gazedata <- function(gazedata_path, eyes = "both", means_need_both = FALSE,
                           apply_corrections = TRUE) {
 
