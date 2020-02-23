@@ -42,8 +42,14 @@ assign_bins <- function(data, bin_width = 3, time_var, ..., bin_col = ".bin",
   data %>%
     group_by(!!! dots) %>%
     arrange(!!! minimal_vars) %>%
-    mutate(!! bin_col := assign_bins_vec(!! time_var, bin_width,
-                                         na_location, partial)) %>%
+    mutate(
+      !! bin_col := assign_bins_vec(
+        !! time_var,
+        bin_width,
+        na_location,
+        partial
+      )
+    ) %>%
     ungroup()
 }
 
@@ -69,13 +75,13 @@ assign_bins <- function(data, bin_width = 3, time_var, ..., bin_col = ".bin",
 #'   to  bin time values into groups of `bin_width`.
 #' @export
 #' @examples
-#' data1 <- data_frame(
+#' data1 <- tibble(
 #'   task = "testing",
 #'   id = "test1",
 #'   time = -4:6,
 #'   frame = seq_along(time))
 #'
-#' data2 <- data_frame(
+#' data2 <- tibble(
 #'   task = "testing",
 #'   id = "test2",
 #'   time = -5:5,
@@ -210,15 +216,19 @@ determine_frame_trimming <- function(times, bin_width = 3, key_time = NULL,
 
   kernel_long <- c(first_half, other_half)
 
-  trimmed <- data_frame(frame_times = curr_times,
-                        frames = seq_along(frame_times),
-                        bins = .data$frames - kernel_long) %>%
+  trimmed <- tibble(
+    frame_times = curr_times,
+    frames = seq_along(frame_times),
+    bins = .data$frames - kernel_long
+  ) %>%
     group_by(.data$bins) %>%
-    mutate(n_frames = n(),
-           frames_in_bin = seq_len(n()),
-           right_size = .data$n_frames == bin_width,
-           after_min = min_was_null | max(.data$frame_times) > min_time,
-           before_max = max_was_null | min(.data$frame_times) < max_time) %>%
+    mutate(
+      n_frames = n(),
+      frames_in_bin = seq_len(n()),
+      right_size = .data$n_frames == bin_width,
+      after_min = min_was_null | max(.data$frame_times) > min_time,
+      before_max = max_was_null | min(.data$frame_times) < max_time
+    ) %>%
     ungroup() %>%
     filter(.data$right_size, .data$after_min, .data$before_max)
 
@@ -226,7 +236,8 @@ determine_frame_trimming <- function(times, bin_width = 3, key_time = NULL,
   key_time_frame <- which.min(abs(trimmed_times - key_time))
   stopifnot(
     key_time_frame %% bin_width == key_position %% bin_width,
-    length(trimmed_times) %% bin_width == 0)
+    length(trimmed_times) %% bin_width == 0
+  )
 
   raw_times %in% trimmed_times
 }

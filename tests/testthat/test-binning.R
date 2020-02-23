@@ -1,7 +1,7 @@
 context("binning")
 
 test_that("assign_bins without grouping variables", {
-  data <- data_frame(
+  data <- tibble(
     Subject = c("S01"),
     Condition = c("a"),
     TrialNo = 1,
@@ -92,13 +92,13 @@ test_that("trim_to_bin_width handles key times", {
   }
 
 
-  data1 <- data_frame(
+  data1 <- tibble(
     task = "testing",
     id = "test1",
     time = -12:13,
     frame = seq_along(time))
 
-  data2 <- data_frame(
+  data2 <- tibble(
     task = "testing",
     id = "test2",
     time = -10:13,
@@ -170,13 +170,13 @@ test_that("trim_to_bin_width handles key times", {
 
 
 test_that("trim_to_bin_width handles min and max times", {
-  data1 <- data_frame(
+  data1 <- tibble(
     task = "testing",
     id = "test1",
     time = -12:13,
     frame = seq_along(time))
 
-  data2 <- data_frame(
+  data2 <- tibble(
     task = "testing",
     id = "test2",
     time = -10:13,

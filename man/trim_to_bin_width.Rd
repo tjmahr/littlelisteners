@@ -47,13 +47,13 @@ time 0 to position 1 will truncate the times so that time 0 will be the first
 frame inside of its bin.
 }
 \examples{
-data1 <- data_frame(
+data1 <- tibble(
   task = "testing",
   id = "test1",
   time = -4:6,
   frame = seq_along(time))
 
-data2 <- data_frame(
+data2 <- tibble(
   task = "testing",
   id = "test2",
   time = -5:5,

@@ -187,7 +187,7 @@ aggregate_looks2 <- function(data, resp_def, resp_var, ...) {
   stopifnot(vapply(resp_def, class, "class") == "response_def")
 
   # Process all definitions in the list
-  x <- list_along(resp_def)
+  x <- purrr::list_along(resp_def)
   for (def in seq_along(resp_def)) {
     x[[def]] <- .aggregate_looks2(data, resp_def[[def]],
                                   !! resp_var, !!! grouping)
