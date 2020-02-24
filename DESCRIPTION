@@ -17,6 +17,8 @@ Imports:
     tidyr,
     tidyselect,
     tibble,
-    purrr
+    purrr,
+    magrittr,
+    rlang
 Roxygen: list(markdown = TRUE)
 Encoding: UTF-8
