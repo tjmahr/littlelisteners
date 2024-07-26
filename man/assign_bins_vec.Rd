@@ -27,6 +27,7 @@ The first step in binning/down-sampling some data is assigning items to bins.
 This function takes a vector and a bin size and returns the bin assignments.
 }
 \examples{
+\dontrun{
 assign_bins_vec(1:14, bin_width = 3, "head")
 # [1] NA NA  1  1  1  2  2  2  3  3  3  4  4  4
 assign_bins_vec(1:14, bin_width = 3, "tail")
@@ -35,5 +36,6 @@ assign_bins_vec(1:7, bin_width = 5, "split")
 # [1] NA  1  1  1  1  1 NA
 assign_bins_vec(1:8, bin_width = 5, "split")
 # [1] NA  1  1  1  1  1 NA NA
+}
 }
 \keyword{internal}

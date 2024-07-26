@@ -72,43 +72,64 @@ assign_bins <- function(data, bin_width = 3, time_var, ..., bin_col = ".bin",
 #'   used, the time values are filtered to exclude whole bins of frames before
 #'   `min_time` and after `max_time`.
 #' @return the original dataframe with its time column trimmed to make it easier
-#'   to  bin time values into groups of `bin_width`.
+#'   to bin time values into groups of `bin_width`.
 #' @export
 #' @examples
-#' data1 <- tibble(
+#' data1 <- tibble::tibble(
 #'   task = "testing",
 #'   id = "test1",
 #'   time = -4:6,
-#'   frame = seq_along(time))
+#'   frame = seq_along(time)
+#' )
 #'
-#' data2 <- tibble(
+#' data2 <- tibble::tibble(
 #'   task = "testing",
 #'   id = "test2",
 #'   time = -5:5,
-#'   frame = seq_along(time))
+#'   frame = seq_along(time)
+#' )
 #'
 #' # Number of rows per id is divisible by bin width
 #' # and time 0 is center of its bin
-#' bind_rows(data1, data2) |>
+#' dplyr::bind_rows(data1, data2) |>
 #'   trim_to_bin_width(3, key_time = 0, key_position = 2, time, id) |>
 #'   assign_bins(3, time, id) |>
-#'   group_by(id, .bin) |>
+#'   dplyr::group_by(id, .bin) |>
 #'   dplyr::mutate(center_time = median(time))
 #'
 #' # And exclude times in bins before some minimum time
-#' bind_rows(data1, data2) |>
-#'   trim_to_bin_width(3, key_time = 0, key_position = 2, time, id,
-#'                     min_time = -1) |>
+#' dplyr::bind_rows(data1, data2) |>
+#'   trim_to_bin_width(
+#'     bin_width = 3,
+#'     key_time = 0,
+#'     key_position = 2,
+#'     time,
+#'     id,
+#'     min_time = -1
+#' ) |>
 #'   assign_bins(3, time, id)
 #'
 #' # And exclude times in bins after some maximum time
-#' bind_rows(data1, data2) |>
-#'   trim_to_bin_width(3, key_time = 0, key_position = 2, time, id,
-#'                     min_time = -1, max_time = 4) |>
+#' dplyr::bind_rows(data1, data2) |>
+#'   trim_to_bin_width(
+#'     bin_width = 3,
+#'     key_time = 0,
+#'     key_position = 2,
+#'     time, id,
+#'     min_time = -1,
+#'     max_time = 4
+#'   ) |>
 #'   assign_bins(3, time, id)
-trim_to_bin_width <- function(data, bin_width = 3, key_time = NULL,
-                              key_position = 1, time_var, ...,
-                              min_time = NULL, max_time = NULL) {
+trim_to_bin_width <- function(
+    data,
+    bin_width = 3,
+    key_time = NULL,
+    key_position = 1,
+    time_var,
+    ...,
+    min_time = NULL,
+    max_time = NULL
+) {
   stopifnot(!is.null(key_time))
   dots <- quos(...)
   time_var <- enquo(time_var)
@@ -161,14 +182,21 @@ trim_to_bin_width <- function(data, bin_width = 3, key_time = NULL,
 
 
 
-determine_frame_trimming <- function(times, bin_width = 3, key_time = NULL,
-                                     key_position = NULL, min_time = NULL,
-                                     max_time = NULL) {
+determine_frame_trimming <- function(
+    times,
+    bin_width = 3,
+    key_time = NULL,
+    key_position = NULL,
+    min_time = NULL,
+    max_time = NULL
+) {
   key_position <- key_position %||% 1
 
   if (key_position > bin_width) {
-    warning("Key position ", key_position, " larger than bin width ",
-            bin_width, call. = FALSE)
+    warning(
+      "Key position ", key_position, " larger than bin width ", bin_width,
+      call. = FALSE
+    )
     key_position <- key_position %% bin_width
     if (key_position == 0) key_position <- bin_width
   }
@@ -216,23 +244,23 @@ determine_frame_trimming <- function(times, bin_width = 3, key_time = NULL,
 
   kernel_long <- c(first_half, other_half)
 
-  trimmed <- tibble(
+  trimmed <- tibble::tibble(
     frame_times = curr_times,
-    frames = seq_along(frame_times),
+    frames = seq_along(.data$frame_times),
     bins = .data$frames - kernel_long
   ) |>
-    group_by(.data$bins) |>
-    mutate(
-      n_frames = n(),
-      frames_in_bin = seq_len(n()),
+    dplyr::group_by(.data$bins) |>
+    dplyr::mutate(
+      n_frames = dplyr::n(),
+      frames_in_bin = seq_len(dplyr::n()),
       right_size = .data$n_frames == bin_width,
       after_min = min_was_null | max(.data$frame_times) > min_time,
       before_max = max_was_null | min(.data$frame_times) < max_time
     ) |>
-    ungroup() |>
-    filter(.data$right_size, .data$after_min, .data$before_max)
+    dplyr::ungroup() |>
+    dplyr::filter(.data$right_size, .data$after_min, .data$before_max)
 
-  trimmed_times <- trimmed |> pull(.data$frame_times)
+  trimmed_times <- trimmed |> dplyr::pull(.data$frame_times)
   key_time_frame <- which.min(abs(trimmed_times - key_time))
   stopifnot(
     key_time_frame %% bin_width == key_position %% bin_width,
@@ -256,6 +284,7 @@ determine_frame_trimming <- function(times, bin_width = 3, key_time = NULL,
 #' @return a vector of bin-numbers. If `bin_width` does not evenly divide
 #'   `xs`, the remainder elements are given a bin number of `NA`.
 #' @examples
+#' \dontrun{
 #' assign_bins_vec(1:14, bin_width = 3, "head")
 #' # [1] NA NA  1  1  1  2  2  2  3  3  3  4  4  4
 #' assign_bins_vec(1:14, bin_width = 3, "tail")
@@ -264,6 +293,7 @@ determine_frame_trimming <- function(times, bin_width = 3, key_time = NULL,
 #' # [1] NA  1  1  1  1  1 NA
 #' assign_bins_vec(1:8, bin_width = 5, "split")
 #' # [1] NA  1  1  1  1  1 NA NA
+#' }
 assign_bins_vec <- function(xs, bin_width = 3, na_location = "tail", partial = FALSE) {
   if (is.unsorted(xs)) {
     warning("Elements to be binned are not sorted")

@@ -73,21 +73,27 @@ defs <- list(target_def, phonological_def)
 four_image_data |>
   aggregate_looks(defs, Subject + BlockNo ~ GazeByImageAOI) |>
   dplyr::select(.response_def, Subject, BlockNo, Primary:PropNA) |>
-  dplyr::mutate_at(c("Prop", "PropSE", "PropNA"), round, 3)
+  dplyr::mutate(
+    Prop = round(Prop, 3),
+    PropSE = round(PropSE, 3),
+    PropNA = round(PropNA, 3)
+  )
 
 # Compute a growth curve
 growth_curve <- four_image_data |>
   adjust_times(Time, TargetOnset, Subject, BlockNo, TrialNo) |>
   aggregate_looks(target_def, Time ~ GazeByImageAOI) |>
-  filter(-1000 <= Time, Time <= 2000)
+  dplyr::filter(-1000 <= Time, Time <= 2000)
 
 library(ggplot2)
 ggplot(growth_curve) +
   aes(x = Time, y = Prop) +
-  geom_hline(size = 2, color = "white", yintercept = .25) +
-  geom_vline(size = 2, color = "white", xintercept = 0) +
+  geom_hline(linewidth = 2, color = "white", yintercept = .25) +
+  geom_vline(linewidth = 2, color = "white", xintercept = 0) +
   geom_pointrange(aes(ymin = Prop - PropSE, ymax = Prop + PropSE)) +
-  labs(y = "Proportion of looks to target",
-       x = "Time relative to target onset [ms]") +
+  labs(
+    y = "Proportion of looks to target",
+    x = "Time relative to target onset [ms]"
+   ) +
   theme_grey(base_size = 14)
 }

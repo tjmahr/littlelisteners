@@ -6,7 +6,7 @@
 \usage{
 adjust_times(
   data,
-  time_var = Time,
+  time_var = quote(Time),
   event_var = NULL,
   ...,
   align = TRUE,

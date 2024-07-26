@@ -1,11 +1,6 @@
 
 #' @import dplyr
-#' @importFrom tools file_path_sans_ext
 NULL
-
-# require("dplyr")
-# require("lazyeval")
-
 
 # Replace all values of gazedata that fall beyond [0, 1] (offscreen) with NA.
 correct_offscreen_gazes <- function(gaze) {
@@ -16,8 +11,6 @@ correct_offscreen_gazes <- function(gaze) {
 correct_distances <- function(gaze) {
   ifelse(gaze < 0, NA, gaze)
 }
-
-
 
 # gazedata_path <- "tests/testthat/data/TargetAbsent/TargetAbsentBlock1_TET_1111.gazedata"
 
@@ -84,7 +77,8 @@ read_gazedata <- function(gazedata_path, eyes = "both", means_need_both = FALSE,
     length(gazedata_path) == 1,
     length(eyes) == 1,
     length(means_need_both) == 1,
-    length(apply_corrections) == 1)
+    length(apply_corrections) == 1
+  )
 
   if (eyes != "both" & means_need_both == TRUE) {
     stop("Cannot average across both eyes if only one eye selected")
@@ -94,10 +88,10 @@ read_gazedata <- function(gazedata_path, eyes = "both", means_need_both = FALSE,
     stop("`eyes` argument should be 'both', 'left' or 'right'")
   }
 
-  gazedata <- gazedata_path %>%
-    read.delim(na.strings = c('-1.#INF', '1.#INF'),
-               stringsAsFactors = FALSE) %>%
-    tbl_df
+  gazedata <- gazedata_path |>
+    utils::read.delim(na.strings = c('-1.#INF', '1.#INF'),
+               stringsAsFactors = FALSE) |>
+    tibble::as_tibble()
 
 
   # Select/rename columns with experiment information (timing and trial
@@ -111,8 +105,8 @@ read_gazedata <- function(gazedata_path, eyes = "both", means_need_both = FALSE,
     DiameterLeft = "DiameterPupilLeftEye",
     DiameterRight = "DiameterPupilRightEye")
 
-  gazedata <- gazedata %>%
-    select_(.dots = cols_to_keep) %>%
+  gazedata <- gazedata |>
+    select_(.dots = cols_to_keep) |>
     mutate_(Origin = ~ "UpperLeft")
 
   # Set some shortcuts
@@ -133,22 +127,22 @@ read_gazedata <- function(gazedata_path, eyes = "both", means_need_both = FALSE,
     screen_cols <- c("XLeft", "XRight", "YLeft", "YRight")
     distances <- c("ZLeft", "ZRight", "DiameterLeft", "DiameterRight")
 
-    gazedata <- gazedata %>%
-      mutate_at(vars(one_of(screen_cols)), funs(correct_offscreen_gazes)) %>%
-      mutate_at(vars(one_of(distances)), funs(correct_distances)) %>%
+    gazedata <- gazedata |>
+      mutate_at(vars(one_of(screen_cols)), funs(correct_offscreen_gazes)) |>
+      mutate_at(vars(one_of(distances)), funs(correct_distances)) |>
       # Flip the y values.
       mutate_(YLeft = ~ 1 - YLeft, YRight = ~ 1 - YRight,
               Origin = ~ "LowerLeft")
   }
 
   if (eyes == "left") {
-    gazedata <- gazedata %>%
+    gazedata <- gazedata |>
       mutate_(XMean = ~ XLeft, YMean = ~ YLeft,
               ZMean = ~ ZLeft, DiameterMean = ~ DiameterLeft)
   }
 
   if (eyes == "right") {
-    gazedata <- gazedata %>%
+    gazedata <- gazedata |>
       mutate_(XMean = ~ XRight, YMean = ~ YRight,
               ZMean = ~ ZRight, DiameterMean = ~ DiameterRight)
   }
@@ -161,7 +155,7 @@ read_gazedata <- function(gazedata_path, eyes = "both", means_need_both = FALSE,
     ifelse(is.nan(xm), NA, xm)
   }
 
-  gazedata <- gazedata %>%
+  gazedata <- gazedata |>
     mutate_(
       XMean = ~ compute_monocular_mean(XLeft, XRight),
       YMean = ~ compute_monocular_mean(YLeft, YRight),

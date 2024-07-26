@@ -39,8 +39,8 @@ read_datawiz <- function(filename, sampling_rate = 33.3333) {
   # we wish we had (with no blank column names).
 
   # Break up tab-delimited tokens in first line to get column names
-  raw_first_line_tokens <- readr::read_lines(filename, n_max = 1) %>%
-    stringr::str_split("\t") %>%
+  raw_first_line_tokens <- readr::read_lines(filename, n_max = 1) |>
+    stringr::str_split("\t") |>
     unlist()
 
   # F0, F33, etc are time samples at 0ms, 33 ms, etc. The blank column names
@@ -63,12 +63,15 @@ read_datawiz <- function(filename, sampling_rate = 33.3333) {
   # Re-read the data. Keep the data rows by removing header-like lines and blank
   # lines.
   lines <- readr::read_lines(filename)
-  first_few_col_names <- paste0(head(raw_first_line_tokens), collapse = "\t")
+  first_few_col_names <- paste0(
+    utils::head(raw_first_line_tokens),
+    collapse = "\t"
+  )
   header_pattern <- paste0("^", first_few_col_names)
   blank_pattern <- "^\\s+$"
 
-  lines_clean <- lines %>%
-    str_reject(header_pattern) %>%
+  lines_clean <- lines |>
+    str_reject(header_pattern) |>
     str_reject(blank_pattern)
 
   # Combine the header row we made with the data rows.
@@ -80,7 +83,7 @@ read_datawiz <- function(filename, sampling_rate = 33.3333) {
 
   # Make sure that readr treats every column as a character (c). Otherwise it
   # will convert our gaze codes (1, 0, -, .) into numbers (1, 0, NA, NA)
-  col_types <- rep_len("c", length(raw_first_line_tokens)) %>%
+  col_types <- rep_len("c", length(raw_first_line_tokens)) |>
     paste0(collapse = "")
 
   readr::read_tsv(
@@ -124,18 +127,18 @@ melt_datawiz <- function(df, key_col = "Time", value_col = "Look") {
   # Assuming X[Numbers] and F[Numbers] are the time columns
   time_cols <- stringr::str_subset(colnames(df), "^[XF]\\d+$")
 
-  df %>%
+  df |>
     tidyr::gather_(key_col = key_col, value_col = value_col,
                    gather_cols = time_cols, na.rm = FALSE, convert = FALSE,
-                   factor_key = FALSE) %>%
+                   factor_key = FALSE) |>
     mutate_(Time = ~ as_time(Time))
 }
 
 as_time <- function(xs) {
-  xs %>%
-    stringr::str_replace("^X", "-") %>%
-    stringr::str_replace("^F", "+") %>%
-    as.numeric
+  xs |>
+    stringr::str_replace("^X", "-") |>
+    stringr::str_replace("^F", "+") |>
+    as.numeric()
 }
 
 
@@ -146,20 +149,20 @@ as_time <- function(xs) {
 #'   "tracked" for ".".
 #' @export
 convert_datawiz_code_to_aoi <- function(xs) {
-  xs <- xs %>%
-    stringr::str_replace("[-]", "NA") %>%
-    stringr::str_replace("1", "Target") %>%
-    stringr::str_replace("0", "Distractor") %>%
+  xs <- xs |>
+    stringr::str_replace("[-]", "NA") |>
+    stringr::str_replace("1", "Target") |>
+    stringr::str_replace("0", "Distractor") |>
     stringr::str_replace("[.]", "tracked")
   xs[xs == "NA"] <- NA
   xs
 }
 
 as_word <- function(xs) {
-  xs <- xs %>%
-    stringr::str_replace("[-]", "dash") %>%
-    stringr::str_replace("1", "Target") %>%
-    stringr::str_replace("0", "Distractor") %>%
+  xs <- xs |>
+    stringr::str_replace("[-]", "dash") |>
+    stringr::str_replace("1", "Target") |>
+    stringr::str_replace("0", "Distractor") |>
     stringr::str_replace("[.]", "dot")
   xs[xs == "NA"] <- NA
   xs

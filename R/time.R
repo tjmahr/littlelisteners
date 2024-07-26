@@ -1,11 +1,26 @@
+#' Find the most frequent interval of values
+#'
+#' When we have trials of varying lengths, it can be helpful to find the
+#' interval of time shared by most of the trials.
+#' @param xs some set of values (times)
+#' @param min_freq the minimum frequency of times to keep
+#' @return a list with the minimum and maximum values that have a frequency of
+#' at least 80%.
+#' @keywords internal
 #' @export
+#' @examples
+#' times <- c(
+#'   -5:10, -10:10, -8:10, -8:10, -8:11, -8:13, -8:4,
+#'   -5:12, -10:9
+#' )
+#' find_frequent_interval(times)
 find_frequent_interval <- function(xs, min_freq = .80) {
-  df <- data_frame(x = xs)
+  df <- tibble::tibble(x = xs)
   most_frequent_values <- df |>
-    filter(!is.na(.data$x)) |>
-    count(.data$x) |>
-    mutate(frequency = .data$n / max(.data$n)) |>
-    filter(min_freq <= .data$frequency)
+    dplyr::filter(!is.na(.data$x)) |>
+    dplyr::count(.data$x) |>
+    dplyr::mutate(frequency = .data$n / max(.data$n)) |>
+    dplyr::filter(min_freq <= .data$frequency)
 
   list(
     lower = min(most_frequent_values$x),
@@ -55,38 +70,59 @@ find_frequent_interval <- function(xs, min_freq = .80) {
 #' # default the first frame is chosen to be zero, but setting `ties` to
 #' # `"last"` will break ties with the later frame.
 #' adjust_times(trial_times, time_ms, event, trial, ties = "last", fps = 1000)
-adjust_times <- function(data, time_var = Time, event_var = NULL, ...,
-                         align = TRUE, fps = 60, ties = "first") {
+adjust_times <- function(
+    data,
+    time_var = quote(Time),
+    event_var = NULL,
+    ...,
+    align = TRUE,
+    fps = 60,
+    ties = "first"
+) {
   time_var <- enquo(time_var)
   event_var <- enquo(event_var)
   dots <- quos(...)
 
-  adjusted_times <- pull(data, !! time_var) - pull(data, !! event_var)
+  adjusted_times <-
+    dplyr::pull(data, !! time_var) - dplyr::pull(data, !! event_var)
   data[[quo_name(time_var)]] <- adjusted_times
 
   if (!align) {
     data
   } else {
     data |>
-      group_by(!!! dots) |>
+      dplyr::group_by(!!! dots) |>
       adjust_times_around_zero(
         time_col = quo_name(time_var),
         fps = fps,
-        ties = ties) |>
+        ties = ties
+      ) |>
       ungroup()
   }
 }
 
-
+#' Adjust time value around 0
+#'
+#' @param data a dataframe of eyetracking data for a single trial or a grouped
+#'   dataframe where the groups define a single trial.
+#' @param time_col name (string) of the column with time value. Defaults to
+#'   `"Time"`.
+#' @return the dataframe with updated time values
+#' @inheritParams adjust_times
 #' @export
-adjust_times_around_zero <- function(x, time_col = "Time", fps = 60, ties = "first") {
-  if (!inherits(x, "grouped_df")) {
-    stop("Please use `group_by()` or set `...` to name grouping columns.\n",
+adjust_times_around_zero <- function(
+    data,
+    time_col = "Time",
+    fps = 60,
+    ties = "first"
+) {
+  if (!inherits(data, "grouped_df")) {
+    stop("Use `group_by()` or set `...` to name grouping columns.\n",
          "  Grouping variables should select a single eyetracking trial.")
   }
 
   dplyr::group_modify(
-    x,
+    data,
     ~ adjust_times_around_zero_one(
       x = .,
       time_col = time_col,
@@ -97,7 +133,12 @@ adjust_times_around_zero <- function(x, time_col = "Time", fps = 60, ties = "fir
 }
 
 
-adjust_times_around_zero_one <- function(x, time_col = "Time", fps = 60, ties = "first") {
+adjust_times_around_zero_one <- function(
+    x,
+    time_col = "Time",
+    fps = 60,
+    ties = "first"
+) {
   times <- x[[time_col]]
   zero_frame <- find_nearest_zero_frame(times, ties)
   centered_frames <- seq_along(times) - zero_frame

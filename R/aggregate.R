@@ -46,8 +46,8 @@ create_response_def <- function(primary, others, elsewhere = NULL,
 }
 
 #' @export
-print.response_def <- function(object, ...) {
-  str(object, ...)
+print.response_def <- function(x, ...) {
+  utils::str(x, ...)
 }
 
 #' Create complementary response definitions
@@ -186,7 +186,7 @@ aggregate_looks2 <- function(data, resp_def, resp_var, ...) {
   resp_var <- enquo(resp_var)
 
   # Tuck a single definition in a list
-  if (class(resp_def) == "response_def") {
+  if (inherits(resp_def, "response_def")) {
     resp_def <- list(resp_def)
   }
 

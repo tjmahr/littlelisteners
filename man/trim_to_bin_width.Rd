@@ -36,7 +36,7 @@ used, the time values are filtered to exclude whole bins of frames before
 }
 \value{
 the original dataframe with its time column trimmed to make it easier
-to  bin time values into groups of \code{bin_width}.
+to bin time values into groups of \code{bin_width}.
 }
 \description{
 Samples of eyetracking data are excluded so that the number of frames is
@@ -47,35 +47,49 @@ time 0 to position 1 will truncate the times so that time 0 will be the first
 frame inside of its bin.
 }
 \examples{
-data1 <- tibble(
+data1 <- tibble::tibble(
   task = "testing",
   id = "test1",
   time = -4:6,
-  frame = seq_along(time))
+  frame = seq_along(time)
+)
 
-data2 <- tibble(
+data2 <- tibble::tibble(
   task = "testing",
   id = "test2",
   time = -5:5,
-  frame = seq_along(time))
+  frame = seq_along(time)
+)
 
 # Number of rows per id is divisible by bin width
 # and time 0 is center of its bin
-bind_rows(data1, data2) |>
+dplyr::bind_rows(data1, data2) |>
   trim_to_bin_width(3, key_time = 0, key_position = 2, time, id) |>
   assign_bins(3, time, id) |>
-  group_by(id, .bin) |>
+  dplyr::group_by(id, .bin) |>
   dplyr::mutate(center_time = median(time))
 
 # And exclude times in bins before some minimum time
-bind_rows(data1, data2) |>
-  trim_to_bin_width(3, key_time = 0, key_position = 2, time, id,
-                    min_time = -1) |>
+dplyr::bind_rows(data1, data2) |>
+  trim_to_bin_width(
+    bin_width = 3,
+    key_time = 0,
+    key_position = 2,
+    time,
+    id,
+    min_time = -1
+) |>
   assign_bins(3, time, id)
 
 # And exclude times in bins after some maximum time
-bind_rows(data1, data2) |>
-  trim_to_bin_width(3, key_time = 0, key_position = 2, time, id,
-                    min_time = -1, max_time = 4) |>
+dplyr::bind_rows(data1, data2) |>
+  trim_to_bin_width(
+    bin_width = 3,
+    key_time = 0,
+    key_position = 2,
+    time, id,
+    min_time = -1,
+    max_time = 4
+  ) |>
   assign_bins(3, time, id)
 }
