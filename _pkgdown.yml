@@ -1,6 +1,7 @@
 url: http://www.tjmahr.com/littlelisteners/
 template:
   bootstrap: 5
+  bootswatch: cerulean
 reference:
   - title: "Aggregating data"
     desc: >
