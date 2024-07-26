@@ -4,7 +4,7 @@ template:
 reference:
   - title: "Aggregating data"
     desc: >
-      Functions for aggregating looking data.
+      Functions for aggregating looking data
     contents:
       - create_response_def
       - cycle_response_def
@@ -26,6 +26,11 @@ reference:
     contents:
       - empirical_logit
       - se_prop
+  - title: "Data"
+    desc: >
+      Example datasets
+    contents:
+      - four_image_data
   - title: "Little Listeners project"
     desc: >
       These functions apply only to data collected for the

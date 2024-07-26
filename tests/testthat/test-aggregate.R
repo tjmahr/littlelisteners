@@ -14,7 +14,6 @@ test_that("aggregate_looks() computes looking proprtions", {
     Time = 1:4
   )
 
-
   # Each line here is a subject:condition where
   # rep(c(look, at, each, frame), 4 trials)
   l <- c(

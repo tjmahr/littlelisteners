@@ -15,7 +15,7 @@ Depends:
     R (>= 3.2.3)
 License: MIT + file LICENSE
 LazyData: true
-RoxygenNote: 7.0.2
+RoxygenNote: 7.3.2
 Imports: 
     dplyr,
     ggplot2,

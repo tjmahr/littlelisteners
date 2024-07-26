@@ -250,6 +250,7 @@ determine_frame_trimming <- function(times, bin_width = 3, key_time = NULL,
 #' The first step in binning/down-sampling some data is assigning items to bins.
 #' This function takes a vector and a bin size and returns the bin assignments.
 #'
+#' @keywords internal
 #' @param xs a vector
 #' @inheritParams assign_bins
 #' @return a vector of bin-numbers. If `bin_width` does not evenly divide

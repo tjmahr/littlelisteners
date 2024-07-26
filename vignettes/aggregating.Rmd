@@ -17,6 +17,9 @@ Let's consider some word recognition eyetracking data from a Visual World style
 experiment. On each trial, an array of images appears. For example:
 
 ```{r sample-screen3, echo = FALSE, out.width = "70%"}
+#| fig.alt: >
+#|   Example screen from the Visual World experiment. Four images arranged in 
+#|   a 2-by-2 grid appear on screen.
 knitr::include_graphics("figure-html/four-image-screen.png")
 ```
 
@@ -121,8 +124,11 @@ thing and computes the aggregation for each one.
 ```{r}
 four_image_data %>% 
   aggregate_looks(all_defs, Subject ~ GazeByImageAOI) %>% 
-  select(ResponseDef = .response_def, Subject, Primary, 
-         Others, Prop, PropSE, PropNA) %>% 
+  select(
+    ResponseDef = .response_def, 
+    Subject, Primary, 
+    Others, Prop, PropSE, PropNA
+  ) %>% 
   knitr::kable()
 ```
 
@@ -155,13 +161,18 @@ growth_curves
 We can plot these growth curves.
 
 ```{r}
+#| fig.alt: >
+#|   Growth curve showing the mean and standard error of proportion of looks 
+#|   to each image at each time point for an individual participant.
 library(ggplot2)
 ggplot(growth_curves) +
   aes(x = Time, y = Prop, color = .response_def) +
   geom_hline(size = 2, color = "white", yintercept = .25) +
   geom_vline(size = 2, color = "white", xintercept = 0) +
   geom_pointrange(aes(ymin = Prop - PropSE, ymax = Prop + PropSE)) +
-  labs(y = "Proportion of looks",
-       x = "Time relative to target onset [ms]",
-       color = "Image")
+  labs(
+    x = "Time relative to target onset [ms]",
+    y = "Proportion of looks",
+    color = "Image"
+  )
 ```

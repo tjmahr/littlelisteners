@@ -3,6 +3,11 @@
 #' @name littlelisteners
 #' @docType package
 #' @import dplyr rlang
+#' @keywords internal
+"_PACKAGE"
+
+## usethis namespace: start
+## usethis namespace: end
 NULL
 
 #' Example data from a Visual World experiment

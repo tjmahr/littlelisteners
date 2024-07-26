@@ -36,3 +36,4 @@ assign_bins_vec(1:7, bin_width = 5, "split")
 assign_bins_vec(1:8, bin_width = 5, "split")
 # [1] NA  1  1  1  1  1 NA NA
 }
+\keyword{internal}

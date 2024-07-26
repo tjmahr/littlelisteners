@@ -4,7 +4,9 @@
 \name{four_image_data}
 \alias{four_image_data}
 \title{Example data from a Visual World experiment}
-\format{A data frame with 20,910 rows and 25 variables}
+\format{
+A data frame with 20,910 rows and 25 variables
+}
 \usage{
 four_image_data
 }
