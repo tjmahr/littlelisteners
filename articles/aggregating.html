@@ -156,17 +156,17 @@ aggregation formula. For example, we can count looks by participant.
 There are several columns here, so we use <code><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse()</a></code> to look
 at some values from every column.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">four_image_data</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/aggregating-looks.html">aggregate_looks</a></span><span class="op">(</span><span class="va">response_def</span>, <span class="va">Subject</span> <span class="op">~</span> <span class="va">GazeByImageAOI</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<code class="sourceCode R"><span><span class="va">four_image_data</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="../reference/aggregating-looks.html">aggregate_looks</a></span><span class="op">(</span><span class="va">response_def</span>, <span class="va">Subject</span> <span class="op">~</span> <span class="va">GazeByImageAOI</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Rows: 1</span></span>
 <span><span class="co">#&gt; Columns: 14</span></span>
 <span><span class="co">#&gt; $ .response_def    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "looks to target"</span></span>
 <span><span class="co">#&gt; $ Subject          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "001P"</span></span>
-<span><span class="co">#&gt; $ PhonologicalFoil <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 2461</span></span>
-<span><span class="co">#&gt; $ SemanticFoil     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 2478</span></span>
-<span><span class="co">#&gt; $ Target           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 4094</span></span>
-<span><span class="co">#&gt; $ Unrelated        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 2033</span></span>
+<span><span class="co">#&gt; $ PhonologicalFoil <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> 2461</span></span>
+<span><span class="co">#&gt; $ SemanticFoil     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> 2478</span></span>
+<span><span class="co">#&gt; $ Target           <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> 4094</span></span>
+<span><span class="co">#&gt; $ Unrelated        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> 2033</span></span>
 <span><span class="co">#&gt; $ Elsewhere        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 1202</span></span>
 <span><span class="co">#&gt; $ Missing          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 8642</span></span>
 <span><span class="co">#&gt; $ Others           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 6972</span></span>
@@ -178,11 +178,11 @@ at some values from every column.</p>
 <p>Or looks by participant by trial. Here we just print the dataframe as
 is.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">four_image_data</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<code class="sourceCode R"><span><span class="va">four_image_data</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="../reference/aggregating-looks.html">aggregate_looks</a></span><span class="op">(</span><span class="va">response_def</span>, <span class="va">Subject</span> <span class="op">+</span> <span class="va">TrialNo</span> <span class="op">~</span> <span class="va">GazeByImageAOI</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 24 × 15</span></span></span>
 <span><span class="co">#&gt;    .response_def  Subject TrialNo PhonologicalFoil SemanticFoil Target Unrelated</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> looks to targ… 001P          1              232           80    250       105</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> looks to targ… 001P          2              181           93    242       160</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> looks to targ… 001P          3               79          101    231        66</span></span>
@@ -207,16 +207,16 @@ response definitions. For instance, we can compare image
 <span>  missing <span class="op">=</span> <span class="cn">NA</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/aggregating-looks.html">aggregate_looks</a></span><span class="op">(</span><span class="va">four_image_data</span>, <span class="va">location_def</span>, <span class="va">Subject</span> <span class="op">~</span> <span class="va">GazeByAOI</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span><span class="fu"><a href="../reference/aggregating-looks.html">aggregate_looks</a></span><span class="op">(</span><span class="va">four_image_data</span>, <span class="va">location_def</span>, <span class="va">Subject</span> <span class="op">~</span> <span class="va">GazeByAOI</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Rows: 1</span></span>
 <span><span class="co">#&gt; Columns: 14</span></span>
 <span><span class="co">#&gt; $ .response_def   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "LowerLeftImage"</span></span>
 <span><span class="co">#&gt; $ Subject         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "001P"</span></span>
-<span><span class="co">#&gt; $ LowerLeftImage  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 2761</span></span>
-<span><span class="co">#&gt; $ LowerRightImage <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 3099</span></span>
-<span><span class="co">#&gt; $ UpperLeftImage  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 2569</span></span>
-<span><span class="co">#&gt; $ UpperRightImage <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 2637</span></span>
+<span><span class="co">#&gt; $ LowerLeftImage  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> 2761</span></span>
+<span><span class="co">#&gt; $ LowerRightImage <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> 3099</span></span>
+<span><span class="co">#&gt; $ UpperLeftImage  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> 2569</span></span>
+<span><span class="co">#&gt; $ UpperRightImage <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> 2637</span></span>
 <span><span class="co">#&gt; $ Elsewhere       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 1202</span></span>
 <span><span class="co">#&gt; $ Missing         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 8642</span></span>
 <span><span class="co">#&gt; $ Others          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 8305</span></span>
@@ -270,13 +270,13 @@ definitions where each response acts as the primary outcome.</p>
 <code><a href="../reference/aggregating-looks.html">aggregate_looks()</a></code> does the right thing and computes the
 aggregation for each one.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">four_image_data</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/aggregating-looks.html">aggregate_looks</a></span><span class="op">(</span><span class="va">all_defs</span>, <span class="va">Subject</span> <span class="op">~</span> <span class="va">GazeByImageAOI</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<code class="sourceCode R"><span><span class="va">four_image_data</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="../reference/aggregating-looks.html">aggregate_looks</a></span><span class="op">(</span><span class="va">all_defs</span>, <span class="va">Subject</span> <span class="op">~</span> <span class="va">GazeByImageAOI</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span></span>
 <span>    ResponseDef <span class="op">=</span> <span class="va">.response_def</span>, </span>
 <span>    <span class="va">Subject</span>, <span class="va">Primary</span>, </span>
 <span>    <span class="va">Others</span>, <span class="va">Prop</span>, <span class="va">PropSE</span>, <span class="va">PropNA</span></span>
-<span>  <span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <table style="width:100%;" class="table">
 <colgroup>
@@ -346,14 +346,14 @@ eyetracking timestamps so that time 0 occurs at target onset. We are
 also going to bin and downsample the eyetracking data to have an
 effective sampling rate of 10 frames per second—just for plotting.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">growth_curves</span> <span class="op">&lt;-</span> <span class="va">four_image_data</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/adjust_times.html">adjust_times</a></span><span class="op">(</span><span class="va">Time</span>, <span class="va">TargetOnset</span>, <span class="va">Subject</span>, <span class="va">BlockNo</span>, <span class="va">TrialNo</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1005</span> <span class="op">&lt;=</span> <span class="va">Time</span>, <span class="va">Time</span> <span class="op">&lt;=</span> <span class="fl">2000</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/assign_bins.html">assign_bins</a></span><span class="op">(</span><span class="fl">6</span>, <span class="va">Time</span>, <span class="va">Subject</span>, <span class="va">BlockNo</span>, <span class="va">TrialNo</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<code class="sourceCode R"><span><span class="va">growth_curves</span> <span class="op">&lt;-</span> <span class="va">four_image_data</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="../reference/adjust_times.html">adjust_times</a></span><span class="op">(</span><span class="va">Time</span>, <span class="va">TargetOnset</span>, <span class="va">Subject</span>, <span class="va">BlockNo</span>, <span class="va">TrialNo</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1005</span> <span class="op">&lt;=</span> <span class="va">Time</span>, <span class="va">Time</span> <span class="op">&lt;=</span> <span class="fl">2000</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="../reference/assign_bins.html">assign_bins</a></span><span class="op">(</span><span class="fl">6</span>, <span class="va">Time</span>, <span class="va">Subject</span>, <span class="va">BlockNo</span>, <span class="va">TrialNo</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="co"># Set a time for each bin</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">Subject</span>, <span class="va">BlockNo</span>, <span class="va">TrialNo</span>, <span class="va">.bin</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>BinTime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">Time</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/aggregating-looks.html">aggregate_looks</a></span><span class="op">(</span><span class="va">all_defs</span>, <span class="va">Subject</span> <span class="op">+</span> <span class="va">BinTime</span> <span class="op">~</span> <span class="va">GazeByImageAOI</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">Subject</span>, <span class="va">BlockNo</span>, <span class="va">TrialNo</span>, <span class="va">.bin</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>BinTime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">Time</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="../reference/aggregating-looks.html">aggregate_looks</a></span><span class="op">(</span><span class="va">all_defs</span>, <span class="va">Subject</span> <span class="op">+</span> <span class="va">BinTime</span> <span class="op">~</span> <span class="va">GazeByImageAOI</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>Time <span class="op">=</span> <span class="va">BinTime</span><span class="op">)</span></span></code></pre></div>
 <p>We now have four growth curves, one for each image type, in a single
 dataframe.</p>
@@ -361,7 +361,7 @@ dataframe.</p>
 <code class="sourceCode R"><span><span class="va">growth_curves</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 120 × 15</span></span></span>
 <span><span class="co">#&gt;    .response_def Subject  Time PhonologicalFoil SemanticFoil Target Unrelated</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> Target        001P    -<span style="color: #BB0000; text-decoration: underline;">1</span><span style="color: #BB0000;">000</span>               54           15     52        24</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> Target        001P     -<span style="color: #BB0000;">900</span>               48           38     47        33</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> Target        001P     -<span style="color: #BB0000;">800</span>               46           45     44        37</span></span>
