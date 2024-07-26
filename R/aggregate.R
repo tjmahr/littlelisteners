@@ -193,10 +193,15 @@ aggregate_looks2 <- function(data, resp_def, resp_var, ...) {
   stopifnot(vapply(resp_def, class, "class") == "response_def")
 
   # Process all definitions in the list
-  x <- purrr::list_along(resp_def)
+  x <- vector("list", length = length(resp_def))
+
   for (def in seq_along(resp_def)) {
-    x[[def]] <- .aggregate_looks2(data, resp_def[[def]],
-                                  !! resp_var, !!! grouping)
+    x[[def]] <- .aggregate_looks2(
+      data,
+      resp_def[[def]],
+      !! resp_var,
+      !!! grouping
+    )
   }
 
   bind_rows(x)
@@ -205,16 +210,22 @@ aggregate_looks2 <- function(data, resp_def, resp_var, ...) {
 # workhorse function for a single aggregation
 .aggregate_looks2 <- function(data, resp_def, resp_var, ...) {
   grouping <- quos(...)
-  grouping_data <- data |> distinct(!!! grouping)
+  grouping_data <- data |> dplyr::distinct(!!! grouping)
   resp_var <- enquo(resp_var)
 
+  chr_resp_var <- tidyselect::vars_pull(names(data), !! resp_var)
+
   # Check that all response types have a coding
-  resp_vals <- unique(pull(data, !! resp_var))
-  check_resp_def(resp_def, resp_vals)
+  resp_vals <- data[[chr_resp_var]] |>
+    unique() |>
+    check_resp_values(resp_def)
 
   # Check that a grouping column name doesn't show up as a gaze column name
-  reserved_name <- c(with_na_label(resp_vals), "Others", "Elsewhere",
-                     "Prop", "PropSE", "PropMissing", ".response_def")
+  reserved_name <- c(
+    with_na_label(resp_vals),
+    "Others", "Elsewhere", "Prop", "PropSE", "PropMissing",
+    ".response_def"
+  )
 
   if (any(grouping %in% reserved_name)) {
     group_names <- names(grouping_data)
@@ -226,10 +237,17 @@ aggregate_looks2 <- function(data, resp_def, resp_var, ...) {
   n <- sym("n")
 
   data_wide <- data |>
-    group_by(!!! grouping) |>
-    count(!! resp_var) |>
+    dplyr::group_by(!!! grouping) |>
+    dplyr::count(.data[[chr_resp_var]]) |>
     ungroup() |>
-    tidyr::spread(!! resp_var, !! n, fill = 0) |>
+    dplyr::mutate(
+      !! resp_var := with_na_label(.data[[chr_resp_var]])
+    ) |>
+    tidyr::pivot_wider(
+      values_from = "n",
+      names_from = tidyselect::all_of(chr_resp_var),
+      values_fill = 0
+    ) |>
     tibble::remove_rownames()
 
   data_wide$Elsewhere <- data_wide |>
@@ -248,26 +266,21 @@ aggregate_looks2 <- function(data, resp_def, resp_var, ...) {
   data_wide$Primary <- data_wide |>
     maybe_row_sums(with_na_label(resp_def$primary))
 
-  primary <- sym("Primary")
-  others <- sym("Others")
-  elsewhere <- sym("Elsewhere")
-  missing <- sym("Missing")
-  prop <- sym("Prop")
-  looks <- sym("Looks")
-
   data_wide |>
-    mutate(
+    dplyr::mutate(
       .response_def = resp_def$response_def,
-      Looks = UQ(primary) + UQ(others) + UQ(elsewhere) + UQ(missing),
-      Prop = UQ(primary) / (UQ(others) + UQ(primary)),
-      PropSE = se_prop(UQ(prop), UQ(others) + UQ(primary)),
-      PropNA = UQ(missing) / UQ(looks)) |>
-    select(.response_def, everything())
+      Looks = .data$Primary + .data$Others + .data$Elsewhere + .data$Missing,
+      Prop = .data$Primary / (.data$Others + .data$Primary),
+      PropSE = se_prop(.data$Prop, .data$Others + .data$Primary),
+      PropNA = .data$Missing / .data$Looks
+    ) |>
+    dplyr::relocate(tidyselect::one_of(".response_def"))
 }
 
 
 
-check_resp_def <- function(resp_def, observed_resp_vals) {
+
+check_resp_values <- function(observed_resp_vals, resp_def) {
   possible_resp_vals <- unlist(resp_def)
   missing <- setdiff(observed_resp_vals, possible_resp_vals)
 
@@ -276,7 +289,7 @@ check_resp_def <- function(resp_def, observed_resp_vals) {
     stop("Response values not found in response definition: ",
          bad, call. = FALSE)
   }
-  NULL
+  observed_resp_vals
 }
 
 with_na_label <- function(xs, na_label = "<NA>") {
