@@ -18,6 +18,7 @@ reference:
       - create_aoi
       - add_aois
       - adjust_times
+      - adjust_times_around_zero
       - assign_bins
       - trim_to_bin_width
       - interpolate_looks

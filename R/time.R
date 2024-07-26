@@ -101,7 +101,7 @@ adjust_times <- function(
   }
 }
 
-#' Adjust time value around 0
+#' Adjust time values around 0
 #'
 #' @param data a dataframe of eyetracking data for a single trial or a grouped
 #'   dataframe where the groups define a single trial.

@@ -2,7 +2,7 @@
 % Please edit documentation in R/time.R
 \name{adjust_times_around_zero}
 \alias{adjust_times_around_zero}
-\title{Adjust time value around 0}
+\title{Adjust time values around 0}
 \usage{
 adjust_times_around_zero(data, time_col = "Time", fps = 60, ties = "first")
 }
@@ -23,5 +23,5 @@ zero. Default is \code{"first"} so that the tie \code{c(-1, 1)} is aligned to
 the dataframe with updated time values
 }
 \description{
-Adjust time value around 0
+Adjust time values around 0
 }
