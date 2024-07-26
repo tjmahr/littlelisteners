@@ -78,18 +78,16 @@ Defaults to <code>FALSE</code>, so that the user is warned if a bin is incomplet
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">assign_bins_vec</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">14</span>, bin_width <span class="op">=</span> <span class="fl">3</span>, <span class="st">"head"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in assign_bins_vec(1:14, bin_width = 3, "head"):</span> could not find function "assign_bins_vec"</span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span><span class="fu">assign_bins_vec</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">14</span>, bin_width <span class="op">=</span> <span class="fl">3</span>, <span class="st">"head"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># [1] NA NA  1  1  1  2  2  2  3  3  3  4  4  4</span></span></span>
 <span class="r-in"><span><span class="fu">assign_bins_vec</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">14</span>, bin_width <span class="op">=</span> <span class="fl">3</span>, <span class="st">"tail"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in assign_bins_vec(1:14, bin_width = 3, "tail"):</span> could not find function "assign_bins_vec"</span>
 <span class="r-in"><span><span class="co"># [1]  1  1  1  2  2  2  3  3  3  4  4  4 NA NA</span></span></span>
 <span class="r-in"><span><span class="fu">assign_bins_vec</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">7</span>, bin_width <span class="op">=</span> <span class="fl">5</span>, <span class="st">"split"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in assign_bins_vec(1:7, bin_width = 5, "split"):</span> could not find function "assign_bins_vec"</span>
 <span class="r-in"><span><span class="co"># [1] NA  1  1  1  1  1 NA</span></span></span>
 <span class="r-in"><span><span class="fu">assign_bins_vec</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">8</span>, bin_width <span class="op">=</span> <span class="fl">5</span>, <span class="st">"split"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in assign_bins_vec(1:8, bin_width = 5, "split"):</span> could not find function "assign_bins_vec"</span>
 <span class="r-in"><span><span class="co"># [1] NA  1  1  1  1  1 NA NA</span></span></span>
+<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

@@ -2,8 +2,8 @@ pandoc: 3.1.11
 pkgdown: 2.1.0
 pkgdown_sha: ~
 articles:
-  aggregating: aggregating.html
-last_built: 2024-07-26T18:20Z
+  articles/aggregating: aggregating.html
+last_built: 2024-07-26T19:45Z
 urls:
   reference: http://www.tjmahr.com/littlelisteners/reference
   article: http://www.tjmahr.com/littlelisteners/articles
