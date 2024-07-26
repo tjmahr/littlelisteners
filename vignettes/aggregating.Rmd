@@ -81,15 +81,15 @@ looks by participant. There are several columns here, so we use `glimpse()`
 to look at some values from every column.
 
 ```{r}
-four_image_data %>% 
-  aggregate_looks(response_def, Subject ~ GazeByImageAOI) %>% 
+four_image_data |> 
+  aggregate_looks(response_def, Subject ~ GazeByImageAOI) |> 
   glimpse()
 ```
 
 Or looks by participant by trial. Here we just print the dataframe as is.
 
 ```{r}
-four_image_data %>% 
+four_image_data |> 
   aggregate_looks(response_def, Subject + TrialNo ~ GazeByImageAOI)
 ```
 
@@ -105,7 +105,7 @@ location_def <- create_response_def(
   missing = NA
 )
 
-aggregate_looks(four_image_data, location_def, Subject ~ GazeByAOI) %>% 
+aggregate_looks(four_image_data, location_def, Subject ~ GazeByAOI) |> 
   glimpse()
 ```
 
@@ -122,13 +122,13 @@ When given a list of response definitions, `aggregate_looks()` does the right
 thing and computes the aggregation for each one.
 
 ```{r}
-four_image_data %>% 
-  aggregate_looks(all_defs, Subject ~ GazeByImageAOI) %>% 
+four_image_data |> 
+  aggregate_looks(all_defs, Subject ~ GazeByImageAOI) |> 
   select(
     ResponseDef = .response_def, 
     Subject, Primary, 
     Others, Prop, PropSE, PropNA
-  ) %>% 
+  ) |> 
   knitr::kable()
 ```
 
@@ -141,14 +141,14 @@ downsample the eyetracking data to have an effective sampling rate of 10 frames
 per second---just for plotting.
 
 ```{r}
-growth_curves <- four_image_data %>% 
-  adjust_times(Time, TargetOnset, Subject, BlockNo, TrialNo) %>% 
-  filter(-1005 <= Time, Time <= 2000) %>% 
-  assign_bins(6, Time, Subject, BlockNo, TrialNo) %>% 
+growth_curves <- four_image_data |> 
+  adjust_times(Time, TargetOnset, Subject, BlockNo, TrialNo) |> 
+  filter(-1005 <= Time, Time <= 2000) |> 
+  assign_bins(6, Time, Subject, BlockNo, TrialNo) |> 
   # Set a time for each bin
-  group_by(Subject, BlockNo, TrialNo, .bin) %>% 
-  mutate(BinTime = round(min(Time))) %>% 
-  aggregate_looks(all_defs, Subject + BinTime ~ GazeByImageAOI) %>% 
+  group_by(Subject, BlockNo, TrialNo, .bin) |> 
+  mutate(BinTime = round(min(Time))) |> 
+  aggregate_looks(all_defs, Subject + BinTime ~ GazeByImageAOI) |> 
   rename(Time = BinTime)
 ```
 

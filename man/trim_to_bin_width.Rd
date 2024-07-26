@@ -61,21 +61,21 @@ data2 <- tibble(
 
 # Number of rows per id is divisible by bin width
 # and time 0 is center of its bin
-bind_rows(data1, data2) \%>\%
-  trim_to_bin_width(3, key_time = 0, key_position = 2, time, id) \%>\%
-  assign_bins(3, time, id) \%>\%
-  group_by(id, .bin) \%>\%
+bind_rows(data1, data2) |>
+  trim_to_bin_width(3, key_time = 0, key_position = 2, time, id) |>
+  assign_bins(3, time, id) |>
+  group_by(id, .bin) |>
   dplyr::mutate(center_time = median(time))
 
 # And exclude times in bins before some minimum time
-bind_rows(data1, data2) \%>\%
+bind_rows(data1, data2) |>
   trim_to_bin_width(3, key_time = 0, key_position = 2, time, id,
-                    min_time = -1) \%>\%
+                    min_time = -1) |>
   assign_bins(3, time, id)
 
 # And exclude times in bins after some maximum time
-bind_rows(data1, data2) \%>\%
+bind_rows(data1, data2) |>
   trim_to_bin_width(3, key_time = 0, key_position = 2, time, id,
-                    min_time = -1, max_time = 4) \%>\%
+                    min_time = -1, max_time = 4) |>
   assign_bins(3, time, id)
 }

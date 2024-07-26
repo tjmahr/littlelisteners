@@ -1,10 +1,10 @@
 #' @export
 find_frequent_interval <- function(xs, min_freq = .80) {
   df <- data_frame(x = xs)
-  most_frequent_values <- df %>%
-    filter(!is.na(.data$x)) %>%
-    count(.data$x) %>%
-    mutate(frequency = .data$n / max(.data$n)) %>%
+  most_frequent_values <- df |>
+    filter(!is.na(.data$x)) |>
+    count(.data$x) |>
+    mutate(frequency = .data$n / max(.data$n)) |>
     filter(min_freq <= .data$frequency)
 
   list(
@@ -67,12 +67,12 @@ adjust_times <- function(data, time_var = Time, event_var = NULL, ...,
   if (!align) {
     data
   } else {
-    data %>%
-      group_by(!!! dots) %>%
+    data |>
+      group_by(!!! dots) |>
       adjust_times_around_zero(
         time_col = quo_name(time_var),
         fps = fps,
-        ties = ties) %>%
+        ties = ties) |>
       ungroup()
   }
 }

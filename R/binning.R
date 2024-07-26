@@ -20,7 +20,7 @@ assign_bins <- function(data, bin_width = 3, time_var, ..., bin_col = ".bin",
   time_var <- enquo(time_var)
 
   minimal_vars <- c(dots, time_var)
-  minimal_data <- data %>% distinct(!!! minimal_vars)
+  minimal_data <- data |> distinct(!!! minimal_vars)
 
   if (bin_col %in% names(data)) {
     msg <- paste0(
@@ -39,9 +39,9 @@ assign_bins <- function(data, bin_width = 3, time_var, ..., bin_col = ".bin",
     stop(call. = FALSE, msg)
   }
 
-  data %>%
-    group_by(!!! dots) %>%
-    arrange(!!! minimal_vars) %>%
+  data |>
+    group_by(!!! dots) |>
+    arrange(!!! minimal_vars) |>
     mutate(
       !! bin_col := assign_bins_vec(
         !! time_var,
@@ -49,7 +49,7 @@ assign_bins <- function(data, bin_width = 3, time_var, ..., bin_col = ".bin",
         na_location,
         partial
       )
-    ) %>%
+    ) |>
     ungroup()
 }
 
@@ -89,22 +89,22 @@ assign_bins <- function(data, bin_width = 3, time_var, ..., bin_col = ".bin",
 #'
 #' # Number of rows per id is divisible by bin width
 #' # and time 0 is center of its bin
-#' bind_rows(data1, data2) %>%
-#'   trim_to_bin_width(3, key_time = 0, key_position = 2, time, id) %>%
-#'   assign_bins(3, time, id) %>%
-#'   group_by(id, .bin) %>%
+#' bind_rows(data1, data2) |>
+#'   trim_to_bin_width(3, key_time = 0, key_position = 2, time, id) |>
+#'   assign_bins(3, time, id) |>
+#'   group_by(id, .bin) |>
 #'   dplyr::mutate(center_time = median(time))
 #'
 #' # And exclude times in bins before some minimum time
-#' bind_rows(data1, data2) %>%
+#' bind_rows(data1, data2) |>
 #'   trim_to_bin_width(3, key_time = 0, key_position = 2, time, id,
-#'                     min_time = -1) %>%
+#'                     min_time = -1) |>
 #'   assign_bins(3, time, id)
 #'
 #' # And exclude times in bins after some maximum time
-#' bind_rows(data1, data2) %>%
+#' bind_rows(data1, data2) |>
 #'   trim_to_bin_width(3, key_time = 0, key_position = 2, time, id,
-#'                     min_time = -1, max_time = 4) %>%
+#'                     min_time = -1, max_time = 4) |>
 #'   assign_bins(3, time, id)
 trim_to_bin_width <- function(data, bin_width = 3, key_time = NULL,
                               key_position = 1, time_var, ...,
@@ -114,7 +114,7 @@ trim_to_bin_width <- function(data, bin_width = 3, key_time = NULL,
   time_var <- enquo(time_var)
 
   minimal_vars <- c(dots, time_var)
-  minimal_data <- data %>% distinct(!!! minimal_vars)
+  minimal_data <- data |> distinct(!!! minimal_vars)
 
   if (nrow(data) != nrow(minimal_data)) {
     names <- as.character(lapply(dots, f_rhs))
@@ -128,31 +128,31 @@ trim_to_bin_width <- function(data, bin_width = 3, key_time = NULL,
 
   # # Fast alternative: Do all the times without grouping
   # if (!is.null(min_time) & !is.null(max_time)) {
-  #   minimal_data %>%
-  #     group_by(!!! dots) %>%
+  #   minimal_data |>
+  #     group_by(!!! dots) |>
   #     summarise(.min_time = min(!! time_var),
-  #               .max_time = max(!! time_var)) %>%
-  #     ungroup() %>%
+  #               .max_time = max(!! time_var)) |>
+  #     ungroup() |>
   #     summarise()
   #
-  #   time_values <- data %>%
-  #     pull(!! time_var) %>%
-  #     unique() %>%
+  #   time_values <- data |>
+  #     pull(!! time_var) |>
+  #     unique() |>
   #     sort()
   #
-  #   to_keep <- time_values %>%
+  #   to_keep <- time_values |>
   #     determine_frame_trimming(bin_width, key_time, key_position,
   #                              min_time, max_time)
   #   times_to_keep <- range(time_values[to_keep])
   #
-  #   data %>%
+  #   data |>
   #     filter(between(UQ(time_var), times_to_keep[1], times_to_keep[2]))
   # } else {
-  data %>%
-    group_by(!!! dots) %>%
+  data |>
+    group_by(!!! dots) |>
     dplyr::filter(
       determine_frame_trimming(!! time_var, bin_width, key_time,
-                               key_position, min_time, max_time)) %>%
+                               key_position, min_time, max_time)) |>
     ungroup()
   # }
 
@@ -220,19 +220,19 @@ determine_frame_trimming <- function(times, bin_width = 3, key_time = NULL,
     frame_times = curr_times,
     frames = seq_along(frame_times),
     bins = .data$frames - kernel_long
-  ) %>%
-    group_by(.data$bins) %>%
+  ) |>
+    group_by(.data$bins) |>
     mutate(
       n_frames = n(),
       frames_in_bin = seq_len(n()),
       right_size = .data$n_frames == bin_width,
       after_min = min_was_null | max(.data$frame_times) > min_time,
       before_max = max_was_null | min(.data$frame_times) < max_time
-    ) %>%
-    ungroup() %>%
+    ) |>
+    ungroup() |>
     filter(.data$right_size, .data$after_min, .data$before_max)
 
-  trimmed_times <- trimmed %>% pull(.data$frame_times)
+  trimmed_times <- trimmed |> pull(.data$frame_times)
   key_time_frame <- which.min(abs(trimmed_times - key_time))
   stopifnot(
     key_time_frame %% bin_width == key_position %% bin_width,

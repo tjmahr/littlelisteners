@@ -121,19 +121,19 @@ cycle_response_def <- function(response_def) {
 #'   elsewhere = "tracked",
 #'   missing = NA)
 #'
-#' four_image_data %>%
+#' four_image_data |>
 #'   aggregate_looks(target_def, Subject + TrialNo ~ GazeByImageAOI)
 #'
-#' four_image_data %>%
-#'   aggregate_looks(target_def, Subject ~ GazeByImageAOI) %>%
+#' four_image_data |>
+#'   aggregate_looks(target_def, Subject ~ GazeByImageAOI) |>
 #'   str()
 #'
 #' # With column names
-#' four_image_data %>%
+#' four_image_data |>
 #'   aggregate_looks2(target_def, GazeByImageAOI, Subject, TrialNo)
 #'
-#' four_image_data %>%
-#'   aggregate_looks2(target_def, GazeByImageAOI, Subject) %>%
+#' four_image_data |>
+#'   aggregate_looks2(target_def, GazeByImageAOI, Subject) |>
 #'   str()
 #'
 #' phonological_def <- create_response_def(
@@ -145,25 +145,31 @@ cycle_response_def <- function(response_def) {
 #'
 #' # Aggregate looks to multiple response definitions at once
 #' defs <- list(target_def, phonological_def)
-#' four_image_data %>%
-#'   aggregate_looks(defs, Subject + BlockNo ~ GazeByImageAOI) %>%
-#'   dplyr::select(.response_def, Subject, BlockNo, Primary:PropNA) %>%
-#'   dplyr::mutate_at(c("Prop", "PropSE", "PropNA"), round, 3)
+#' four_image_data |>
+#'   aggregate_looks(defs, Subject + BlockNo ~ GazeByImageAOI) |>
+#'   dplyr::select(.response_def, Subject, BlockNo, Primary:PropNA) |>
+#'   dplyr::mutate(
+#'     Prop = round(Prop, 3),
+#'     PropSE = round(PropSE, 3),
+#'     PropNA = round(PropNA, 3)
+#'   )
 #'
 #' # Compute a growth curve
-#' growth_curve <- four_image_data %>%
-#'   adjust_times(Time, TargetOnset, Subject, BlockNo, TrialNo) %>%
-#'   aggregate_looks(target_def, Time ~ GazeByImageAOI) %>%
-#'   filter(-1000 <= Time, Time <= 2000)
+#' growth_curve <- four_image_data |>
+#'   adjust_times(Time, TargetOnset, Subject, BlockNo, TrialNo) |>
+#'   aggregate_looks(target_def, Time ~ GazeByImageAOI) |>
+#'   dplyr::filter(-1000 <= Time, Time <= 2000)
 #'
 #' library(ggplot2)
 #' ggplot(growth_curve) +
 #'   aes(x = Time, y = Prop) +
-#'   geom_hline(size = 2, color = "white", yintercept = .25) +
-#'   geom_vline(size = 2, color = "white", xintercept = 0) +
+#'   geom_hline(linewidth = 2, color = "white", yintercept = .25) +
+#'   geom_vline(linewidth = 2, color = "white", xintercept = 0) +
 #'   geom_pointrange(aes(ymin = Prop - PropSE, ymax = Prop + PropSE)) +
-#'   labs(y = "Proportion of looks to target",
-#'        x = "Time relative to target onset [ms]") +
+#'   labs(
+#'     y = "Proportion of looks to target",
+#'     x = "Time relative to target onset [ms]"
+#'    ) +
 #'   theme_grey(base_size = 14)
 aggregate_looks <- function(data, resp_def, formula) {
   resp_var <- quo(!! formula[[3]])
@@ -199,7 +205,7 @@ aggregate_looks2 <- function(data, resp_def, resp_var, ...) {
 # workhorse function for a single aggregation
 .aggregate_looks2 <- function(data, resp_def, resp_var, ...) {
   grouping <- quos(...)
-  grouping_data <- data %>% distinct(!!! grouping)
+  grouping_data <- data |> distinct(!!! grouping)
   resp_var <- enquo(resp_var)
 
   # Check that all response types have a coding
@@ -212,34 +218,34 @@ aggregate_looks2 <- function(data, resp_def, resp_var, ...) {
 
   if (any(grouping %in% reserved_name)) {
     group_names <- names(grouping_data)
-    illegal_names <- group_names[grouping %in% reserved_name] %>%
+    illegal_names <- group_names[grouping %in% reserved_name] |>
       paste0(collapse = ", ")
 
     stop("Please rename the following grouping variables: ", illegal_names)
   }
   n <- sym("n")
 
-  data_wide <- data %>%
-    group_by(!!! grouping) %>%
-    count(!! resp_var) %>%
-    ungroup() %>%
-    tidyr::spread(!! resp_var, !! n, fill = 0) %>%
+  data_wide <- data |>
+    group_by(!!! grouping) |>
+    count(!! resp_var) |>
+    ungroup() |>
+    tidyr::spread(!! resp_var, !! n, fill = 0) |>
     tibble::remove_rownames()
 
-  data_wide$Elsewhere <- data_wide %>%
+  data_wide$Elsewhere <- data_wide |>
     maybe_row_sums(with_na_label(resp_def$elsewhere))
 
-  data_wide$Missing <- data_wide %>%
+  data_wide$Missing <- data_wide |>
     maybe_row_sums(with_na_label(resp_def$missing))
 
-  data_wide$Others <- data_wide %>%
+  data_wide$Others <- data_wide |>
     maybe_row_sums(with_na_label(resp_def$others))
 
-  data_wide <- data_wide %>%
-    drop_one_of(with_na_label(resp_def$missing)) %>%
+  data_wide <- data_wide |>
+    drop_one_of(with_na_label(resp_def$missing)) |>
     drop_one_of(with_na_label(resp_def$elsewhere))
 
-  data_wide$Primary <- data_wide %>%
+  data_wide$Primary <- data_wide |>
     maybe_row_sums(with_na_label(resp_def$primary))
 
   primary <- sym("Primary")
@@ -249,13 +255,13 @@ aggregate_looks2 <- function(data, resp_def, resp_var, ...) {
   prop <- sym("Prop")
   looks <- sym("Looks")
 
-  data_wide %>%
+  data_wide |>
     mutate(
       .response_def = resp_def$response_def,
       Looks = UQ(primary) + UQ(others) + UQ(elsewhere) + UQ(missing),
       Prop = UQ(primary) / (UQ(others) + UQ(primary)),
       PropSE = se_prop(UQ(prop), UQ(others) + UQ(primary)),
-      PropNA = UQ(missing) / UQ(looks)) %>%
+      PropNA = UQ(missing) / UQ(looks)) |>
     select(.response_def, everything())
 }
 

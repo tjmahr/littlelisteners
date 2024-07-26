@@ -46,19 +46,19 @@ target_def <- create_response_def(
   elsewhere = "tracked",
   missing = NA)
 
-four_image_data \%>\%
+four_image_data |>
   aggregate_looks(target_def, Subject + TrialNo ~ GazeByImageAOI)
 
-four_image_data \%>\%
-  aggregate_looks(target_def, Subject ~ GazeByImageAOI) \%>\%
+four_image_data |>
+  aggregate_looks(target_def, Subject ~ GazeByImageAOI) |>
   str()
 
 # With column names
-four_image_data \%>\%
+four_image_data |>
   aggregate_looks2(target_def, GazeByImageAOI, Subject, TrialNo)
 
-four_image_data \%>\%
-  aggregate_looks2(target_def, GazeByImageAOI, Subject) \%>\%
+four_image_data |>
+  aggregate_looks2(target_def, GazeByImageAOI, Subject) |>
   str()
 
 phonological_def <- create_response_def(
@@ -70,15 +70,15 @@ phonological_def <- create_response_def(
 
 # Aggregate looks to multiple response definitions at once
 defs <- list(target_def, phonological_def)
-four_image_data \%>\%
-  aggregate_looks(defs, Subject + BlockNo ~ GazeByImageAOI) \%>\%
-  dplyr::select(.response_def, Subject, BlockNo, Primary:PropNA) \%>\%
+four_image_data |>
+  aggregate_looks(defs, Subject + BlockNo ~ GazeByImageAOI) |>
+  dplyr::select(.response_def, Subject, BlockNo, Primary:PropNA) |>
   dplyr::mutate_at(c("Prop", "PropSE", "PropNA"), round, 3)
 
 # Compute a growth curve
-growth_curve <- four_image_data \%>\%
-  adjust_times(Time, TargetOnset, Subject, BlockNo, TrialNo) \%>\%
-  aggregate_looks(target_def, Time ~ GazeByImageAOI) \%>\%
+growth_curve <- four_image_data |>
+  adjust_times(Time, TargetOnset, Subject, BlockNo, TrialNo) |>
+  aggregate_looks(target_def, Time ~ GazeByImageAOI) |>
   filter(-1000 <= Time, Time <= 2000)
 
 library(ggplot2)

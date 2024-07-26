@@ -12,7 +12,7 @@ Authors@R:
 Description: This package houses frequently used functions for working with
     hand-coded eyetracking data.
 Depends:
-    R (>= 3.2.3)
+    R (>= 4.1.0)
 License: MIT + file LICENSE
 LazyData: true
 RoxygenNote: 7.3.2
@@ -25,7 +25,6 @@ Imports:
     tidyselect,
     tibble,
     purrr,
-    magrittr,
     rlang
 Roxygen: list(markdown = TRUE)
 Encoding: UTF-8
