@@ -15,6 +15,12 @@ knitr::opts_chunk$set(
 
 # Little Listeners
 
+<!-- badges: start -->
+
+[![R-CMD-check](https://github.com/tjmahr/littlelisteners/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/tjmahr/littlelisteners/actions/workflows/R-CMD-check.yaml)
+
+<!-- badges: end -->
+
 Tools for working with data from word recognition eyetracking experiments.
 
 ## Installation

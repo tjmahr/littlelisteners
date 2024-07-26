@@ -1,24 +1,32 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-Little Listeners
-================
 
-Tools for working with data from word recognition eyetracking experiments.
+# Little Listeners
 
-Installation
-------------
+<!-- badges: start -->
 
-First install the devtools package, then install the package from this repository.
+[![R-CMD-check](https://github.com/tjmahr/littlelisteners/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/tjmahr/littlelisteners/actions/workflows/R-CMD-check.yaml)
+
+<!-- badges: end -->
+
+Tools for working with data from word recognition eyetracking
+experiments.
+
+## Installation
+
+First install the devtools package, then install the package from this
+repository.
 
 ``` r
 install.packages("devtools")
 devtools::install_github("tjmahr/littlelisteners")
 ```
 
-Learn more
-----------
+## Learn more
 
-See the [documentation website](https://tjmahr.github.io/littlelisteners/) for package tutorials and documentation.
+See the [documentation
+website](https://tjmahr.github.io/littlelisteners/) for package
+tutorials and documentation.
 
 <!-- ### Other features -->
 <!-- I've also migrated `empirical_logit` functions from [lookr](https://github.com/tjmahr/lookr). -->

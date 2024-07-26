@@ -6,3 +6,4 @@
 ^inst/site$
 ^_pkgdown\.yml$
 ^data-raw$
+^\.github$
