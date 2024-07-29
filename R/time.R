@@ -85,7 +85,10 @@ adjust_times <- function(
 
   adjusted_times <-
     dplyr::pull(data, !! time_var) - dplyr::pull(data, !! event_var)
-  data[[quo_name(time_var)]] <- adjusted_times
+
+  time_col <- data |> dplyr::select(!! time_var) |> names()
+
+  data[[time_col]] <- adjusted_times
 
   if (!align) {
     data
@@ -93,7 +96,7 @@ adjust_times <- function(
     data |>
       dplyr::group_by(!!! dots) |>
       adjust_times_around_zero(
-        time_col = quo_name(time_var),
+        time_col = time_col,
         fps = fps,
         ties = ties
       ) |>

@@ -49,3 +49,40 @@ test_that("Reading a ragged DataWiz file", {
   # column will have extra characters. Confirm that this does not happen.
   expect_true(all(nchar(df$F67) == 1))
 })
+
+
+test_that("Melting a DataWiz file", {
+  # Parse this file so that there are no repeated header rows and the blank
+  # headers are given negative time values:
+
+  # Header1	Header2	Header3	 	 	 	 	 	F0	F33	F67
+  # KidA	Day1	Data3	-	-	-	-	-	-	-	-
+  # KidA	Day1	Data3	.	.	.	.	.	.	.	.
+  # KidA	Day1	Data3	0	0	0	0	0	0	0	0
+  # Header1	Header2	Header3	 	 	 	 	 	F0	F33	F67
+  # KidA	Day2	Data3	1	1	1	1	1	1	1	1
+  # KidA	Day2	Data3	.	-	0	1	.	-	0	1
+  # KidA	Day2	Data3	1	1	1	0	0	.	.	.
+  # Header1	Header2	Header3	 	 	 	 	 	F0	F33	F67
+  # KidB	Day1	Data3	.	.	.	.	.	.	.	.
+  # KidB	Day1	Data3	.	.	.	.	.	.	.	.
+  # KidB	Day1	Data3	.	.	.	.	.	.	.	.
+
+  df1 <- testthat::test_path("data/data_wiz_mock.txt") |>
+    read_datawiz() |>
+    melt_datawiz()
+
+  df2 <- testthat::test_path("data/data_wiz_mock_ragged.txt") |>
+    read_datawiz() |>
+    melt_datawiz("when", "where")
+
+  times_1 <- c(-167, -133, -100, -67, -33, 0, 33, 67)
+  times_2 <- c(-167, -133, -100, -67, -33, 0, 33, 67, 100, 133, 167, 200, 233)
+  expected_names_1 <- c("Header1", "Header2", "Header3", "Time", "Look")
+  expected_names_2 <- c("Header1", "Header2", "Header3", "when", "where")
+
+  expect_setequal(df1$Time, times_1)
+  expect_setequal(df2$when, times_2)
+  expect_equal(names(df1), expected_names_1)
+  expect_equal(names(df2), expected_names_2)
+})

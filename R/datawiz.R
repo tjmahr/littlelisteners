@@ -172,14 +172,15 @@ column_sequence <- function(
 #' @return a long data-frame
 #' @export
 melt_datawiz <- function(df, key_col = "Time", value_col = "Look") {
-  # Assuming X[Numbers] and F[Numbers] are the time columns
-  time_cols <- stringr::str_subset(colnames(df), "^[XF]\\d+$")
-
   df |>
-    tidyr::gather_(key_col = key_col, value_col = value_col,
-                   gather_cols = time_cols, na.rm = FALSE, convert = FALSE,
-                   factor_key = FALSE) |>
-    mutate_(Time = ~ as_time(Time))
+    tidyr::pivot_longer(
+      # Assuming X[Numbers] and F[Numbers] are the time columns
+      cols = tidyselect::matches("^[XF]\\d+$"),
+      names_to = key_col,
+      values_to = value_col,
+      names_transform = as_time,
+      values_drop_na = FALSE
+    )
 }
 
 as_time <- function(xs) {
