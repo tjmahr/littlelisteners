@@ -3,7 +3,7 @@ pkgdown: 2.1.0
 pkgdown_sha: ~
 articles:
   articles/aggregating: aggregating.html
-last_built: 2024-07-26T19:45Z
+last_built: 2024-07-29T15:04Z
 urls:
   reference: http://www.tjmahr.com/littlelisteners/reference
   article: http://www.tjmahr.com/littlelisteners/articles
