@@ -80,11 +80,11 @@ duration will be interpolated</p></dd>
 
 
 <dt id="arg-response-col">response_col<a class="anchor" aria-label="anchor" href="#arg-response-col"></a></dt>
-<dd><p>name of the column with the eyetracking response data</p></dd>
+<dd><p>(character) name of the column with the eyetracking response data</p></dd>
 
 
 <dt id="arg-interp-col">interp_col<a class="anchor" aria-label="anchor" href="#arg-interp-col"></a></dt>
-<dd><p>name of a column to add to the dataframe. This column
+<dd><p>(character) name of a column to add to the dataframe. This column
 records whether each frame was interpolated (TRUE) or not (FALSE)</p></dd>
 
 
@@ -94,7 +94,7 @@ These would typically be AOI locations.</p></dd>
 
 
 <dt id="arg-missing-looks">missing_looks<a class="anchor" aria-label="anchor" href="#arg-missing-looks"></a></dt>
-<dd><p>values that can be imputed</p></dd>
+<dd><p>values that can be imputed.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -105,6 +105,65 @@ someone to shift their gaze from Image A to Image B to Image A in that
 amount of time.</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># We have time in ms, measured at 60 fps, and</span></span></span>
+<span class="r-in"><span><span class="co"># we want to fill in gaps of 100 ms.</span></span></span>
+<span class="r-in"><span><span class="va">looks</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tribble.html" class="external-link">tribble</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="op">~</span><span class="va">Subject</span>, <span class="op">~</span><span class="va">Trial</span>, <span class="op">~</span><span class="va">Time</span>,    <span class="op">~</span><span class="va">AOI</span>,         <span class="op">~</span><span class="va">Hint</span>,</span></span>
+<span class="r-in"><span>       <span class="st">"A"</span>,      <span class="fl">1</span>,  <span class="fl">1000</span>,  <span class="st">"Left"</span>,     <span class="st">"present"</span>,</span></span>
+<span class="r-in"><span>       <span class="st">"A"</span>,      <span class="fl">1</span>,  <span class="fl">1017</span>,  <span class="st">"Left"</span>,     <span class="st">"present"</span>,</span></span>
+<span class="r-in"><span>       <span class="st">"A"</span>,      <span class="fl">1</span>,  <span class="fl">1034</span>,      <span class="cn">NA</span>,   <span class="st">"legal gap"</span>,</span></span>
+<span class="r-in"><span>       <span class="st">"A"</span>,      <span class="fl">1</span>,  <span class="fl">1051</span>,      <span class="cn">NA</span>,   <span class="st">"legal gap"</span>,</span></span>
+<span class="r-in"><span>       <span class="st">"A"</span>,      <span class="fl">1</span>,  <span class="fl">1068</span>,      <span class="cn">NA</span>,   <span class="st">"legal gap"</span>,</span></span>
+<span class="r-in"><span>       <span class="st">"A"</span>,      <span class="fl">1</span>,  <span class="fl">1084</span>,  <span class="st">"Left"</span>,     <span class="st">"present"</span>,</span></span>
+<span class="r-in"><span>       <span class="st">"A"</span>,      <span class="fl">1</span>,  <span class="fl">1100</span>,      <span class="cn">NA</span>, <span class="st">"illegal gap"</span>,</span></span>
+<span class="r-in"><span>       <span class="st">"A"</span>,      <span class="fl">2</span>,   <span class="fl">983</span>,  <span class="st">"Left"</span>,     <span class="st">"present"</span>,</span></span>
+<span class="r-in"><span>       <span class="st">"A"</span>,      <span class="fl">2</span>,  <span class="fl">1000</span>, <span class="st">"Right"</span>,     <span class="st">"present"</span>,</span></span>
+<span class="r-in"><span>       <span class="st">"A"</span>,      <span class="fl">2</span>,  <span class="fl">1017</span>,      <span class="cn">NA</span>, <span class="st">"illegal gap"</span>,</span></span>
+<span class="r-in"><span>       <span class="st">"A"</span>,      <span class="fl">2</span>,  <span class="fl">1034</span>,      <span class="cn">NA</span>, <span class="st">"illegal gap"</span>,</span></span>
+<span class="r-in"><span>       <span class="st">"A"</span>,      <span class="fl">2</span>,  <span class="fl">1051</span>,      <span class="cn">NA</span>, <span class="st">"illegal gap"</span>,</span></span>
+<span class="r-in"><span>       <span class="st">"A"</span>,      <span class="fl">2</span>,  <span class="fl">1068</span>,      <span class="cn">NA</span>, <span class="st">"illegal gap"</span>,</span></span>
+<span class="r-in"><span>       <span class="st">"A"</span>,      <span class="fl">2</span>,  <span class="fl">1084</span>,      <span class="cn">NA</span>, <span class="st">"illegal gap"</span>,</span></span>
+<span class="r-in"><span>       <span class="st">"A"</span>,      <span class="fl">2</span>,  <span class="fl">1100</span>,      <span class="cn">NA</span>, <span class="st">"illegal gap"</span>,</span></span>
+<span class="r-in"><span>       <span class="st">"A"</span>,      <span class="fl">2</span>,  <span class="fl">1118</span>,      <span class="cn">NA</span>, <span class="st">"illegal gap"</span>,</span></span>
+<span class="r-in"><span>       <span class="st">"A"</span>,      <span class="fl">2</span>,  <span class="fl">1135</span>, <span class="st">"Right"</span>,     <span class="st">"present"</span>,</span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Note that only the "legal gap" rows were interpolated</span></span></span>
+<span class="r-in"><span><span class="va">looks</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">Trial</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu">interpolate_looks</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    window <span class="op">=</span> <span class="fl">100</span>,</span></span>
+<span class="r-in"><span>    fps <span class="op">=</span> <span class="fl">60</span>,</span></span>
+<span class="r-in"><span>    response_col <span class="op">=</span> <span class="st">"AOI"</span>,</span></span>
+<span class="r-in"><span>    interp_col <span class="op">=</span> <span class="st">"Interpolated"</span>,</span></span>
+<span class="r-in"><span>    fillable <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Left"</span>, <span class="st">"Right"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    missing_looks <span class="op">=</span> <span class="cn">NA</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 17 × 6</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Groups:   Trial [2]</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    Subject Trial  Time AOI   Hint        Interpolated</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> A           1  <span style="text-decoration: underline;">1</span>000 Left  present     FALSE       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> A           1  <span style="text-decoration: underline;">1</span>017 Left  present     FALSE       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> A           1  <span style="text-decoration: underline;">1</span>034 Left  legal gap   TRUE        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> A           1  <span style="text-decoration: underline;">1</span>051 Left  legal gap   TRUE        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> A           1  <span style="text-decoration: underline;">1</span>068 Left  legal gap   TRUE        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> A           1  <span style="text-decoration: underline;">1</span>084 Left  present     FALSE       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> A           1  <span style="text-decoration: underline;">1</span>100 <span style="color: #BB0000;">NA</span>    illegal gap FALSE       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> A           2   983 Left  present     FALSE       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> A           2  <span style="text-decoration: underline;">1</span>000 Right present     FALSE       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> A           2  <span style="text-decoration: underline;">1</span>017 <span style="color: #BB0000;">NA</span>    illegal gap FALSE       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">11</span> A           2  <span style="text-decoration: underline;">1</span>034 <span style="color: #BB0000;">NA</span>    illegal gap FALSE       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">12</span> A           2  <span style="text-decoration: underline;">1</span>051 <span style="color: #BB0000;">NA</span>    illegal gap FALSE       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">13</span> A           2  <span style="text-decoration: underline;">1</span>068 <span style="color: #BB0000;">NA</span>    illegal gap FALSE       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">14</span> A           2  <span style="text-decoration: underline;">1</span>084 <span style="color: #BB0000;">NA</span>    illegal gap FALSE       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">15</span> A           2  <span style="text-decoration: underline;">1</span>100 <span style="color: #BB0000;">NA</span>    illegal gap FALSE       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">16</span> A           2  <span style="text-decoration: underline;">1</span>118 <span style="color: #BB0000;">NA</span>    illegal gap FALSE       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">17</span> A           2  <span style="text-decoration: underline;">1</span>135 Right present     FALSE       </span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 
