@@ -19,12 +19,17 @@
 #' " " to "X33", where the X indicates a negative time sample.
 read_datawiz <- function(filename, sampling_rate = 33.3333) {
   # Datawiz files are tab-separated files containing several tables concatenated
-  # together, so there are multiple rows with the column names:
+  # together, so there are multiple rows with the column names. I have also
+  # run into completely empty lines too. Some of the rows
+  # may be "ragged". For example, in the 2nd row here, there are more columns of
+  # data than there are columns in the header row. Finally, there are blank
+  # column names. These are negative time frames (before F0).
 
   # Header1	Header2	Header3	 	 	 	 	 	F0	F33	F67
   # KidA	Day1	Data3	-	-	-	-	-	-	-	-
-  # KidA	Day1	Data3	.	.	.	.	.	.	.	.
+  # KidA	Day1	Data3	.	.	.	.	.	.	.	. . . .
   # KidA	Day1	Data3	0	0	0	0	0	0	0	0
+  #
   # Header1	Header2	Header3	 	 	 	 	 	F0	F33	F67
   # KidA	Day2	Data3	1	1	1	1	1	1	1	1
   # KidA	Day2	Data3	.	-	0	1	.	-	0	1
@@ -34,80 +39,123 @@ read_datawiz <- function(filename, sampling_rate = 33.3333) {
   # KidB	Day1	Data3	.	.	.	.	.	.	.	.
   # KidB	Day1	Data3	.	.	.	.	.	.	.	.
 
-  # Some of the column names are empty, in the mock-data above there are five
-  # tabs between "Header3" and "F0". Our first job is to create the header row
-  # we wish we had (with no blank column names).
 
-  # Break up tab-delimited tokens in first line to get column names
-  raw_first_line_tokens <- readr::read_lines(filename, n_max = 1) |>
+  # Handle the empty line problem at read time
+  lines <- readr::read_lines(filename, skip_empty_rows = TRUE)
+
+  # Handle the repeated header line problem
+  first_few_col_names <- lines[1] |>
     stringr::str_split("\t") |>
-    unlist()
+    unlist() |>
+    utils::head() |>
+    paste0(collapse = "\t")
 
-  # F0, F33, etc are time samples at 0ms, 33 ms, etc. The blank column names
-  # are time samples that occur before F0. We convert the blanks to times
-  # counting back from 0, so the headers around time 0 are "X67  X33 F0  F33".
-  blank_cols <- which(raw_first_line_tokens == " ")
-  new_times <- backfill_column_names(blank_cols, "X", sampling_rate)
-  new_first_line_tokens <- raw_first_line_tokens
-  new_first_line_tokens[blank_cols] <- new_times
+  re_header <- paste0("^", first_few_col_names)
 
-  # Create new columns for the blanks at the end of the file
-  first_col <- which(raw_first_line_tokens == "F33")
-  positive_cols <- seq(first_col, length(raw_first_line_tokens))
-  positive_times <- fill_column_names(positive_cols, "F", sampling_rate, offset = 0)
-  new_first_line_tokens[positive_cols] <- positive_times
-
-  # Assemble desired header line
-  first_line <- paste0(new_first_line_tokens, collapse = "\t")
-
-  # Re-read the data. Keep the data rows by removing header-like lines and blank
-  # lines.
-  lines <- readr::read_lines(filename)
-  first_few_col_names <- paste0(
-    utils::head(raw_first_line_tokens),
-    collapse = "\t"
+  lines_clean <- c(
+    lines[1],
+    lines[-1] |>
+      stringr::str_subset(re_header, negate = TRUE)
   )
-  header_pattern <- paste0("^", first_few_col_names)
-  blank_pattern <- "^\\s+$"
 
-  lines_clean <- lines |>
-    str_reject(header_pattern) |>
-    str_reject(blank_pattern)
+  # Handle the ragged row problem by reading into long format and pivoting into
+  # wide format
+  m <- meltr::melt_tsv(I(lines_clean))
 
-  # Combine the header row we made with the data rows.
-  lines <- c(first_line, lines_clean)
+  # Prepare columns names of wide dataframe
 
-  # Combine the lines into a single blob of text and parse that literal data
-  # like a file
-  flat_lines <- paste0(lines, collapse = "\n")
+  # Get the known column names
+  header <- rep(NA, max(m$col))
+  header_in_file <- m |>
+    dplyr::filter(.data$row == 1) |>
+    dplyr::pull(.data$value)
+  header[seq_along(header_in_file)] <- header_in_file
 
-  # Make sure that readr treats every column as a character (c). Otherwise it
-  # will convert our gaze codes (1, 0, -, .) into numbers (1, 0, NA, NA)
-  col_types <- rep_len("c", length(raw_first_line_tokens)) |>
-    paste0(collapse = "")
+  # Impute blank column names before F0 as negative (prefix with X)
+  f0_col <- m |>
+    dplyr::filter(.data$value == "F0", .data$row == 1) |>
+    dplyr::pull(.data$col)
 
-  readr::read_tsv(
-    file = flat_lines,
-    trim_ws = TRUE,
-    na = c("", "NA"),
-    col_types = col_types)
+  blanks_before_f0 <- header[seq_len(f0_col)] |> is.na() |> which()
+
+  header <- header |>
+    fill_column_names_in_range(
+      range_start = min(blanks_before_f0),
+      range_end = max(blanks_before_f0),
+      col_prefix = "X",
+      increment = 33.3333333,
+      direction = "backward"
+    ) |>
+    # Renumber all positive times (cols from F33 and after, prefix with F)
+    fill_column_names_in_range(
+      range_start = which(header == "F33"),
+      # range_end = max(blanks_before_f0),
+      col_prefix = "F",
+      increment = 33.3333333,
+      direction = "forward"
+    )
+
+  m |>
+    dplyr::left_join(
+      tibble::tibble(col_name = header, col = seq_along(header)),
+      by = "col"
+    ) |>
+    dplyr::filter(.data$row != 1) |>
+    tidyr::pivot_wider(
+      id_cols = dplyr::one_of("row"),
+      names_from = "col_name",
+      values_from = "value"
+    ) |>
+    dplyr::select(-dplyr::one_of("row"))
 }
 
-fill_column_names <- function(cols, col_prefix, increment, offset = 0, rounding = 0) {
+
+
+
+fill_column_names_in_range <- function(
+    cols,
+    range_start,
+    range_end = NULL,
+    col_prefix,
+    increment,
+    offset = 0,
+    rounding = 0,
+    direction = c("forward", "backward")
+) {
+  direction <- match.arg(direction)
+  range_end <- range_end %||% length(cols)
+
+  new_cols <- column_sequence(
+    seq(range_start, range_end),
+    col_prefix,
+    increment,
+    offset,
+    rounding,
+    direction
+  )
+  cols[seq(range_start, range_end)] <- new_cols
+  cols
+}
+
+
+column_sequence <- function(
+    cols,
+    col_prefix,
+    increment,
+    offset = 0,
+    rounding = 0,
+    direction = c("forward", "backward")
+) {
+  direction <- match.arg(direction)
   times <- (seq_along(cols) * increment) + offset
   time_values <- round(times, rounding)
   col_names <- sprintf("%s%s", col_prefix, time_values)
-  col_names
-}
 
-
-backfill_column_names <- function(cols, col_prefix, increment, rounding = 0) {
-  rev(fill_column_names(cols, col_prefix, increment, rounding, offset = 0))
-}
-
-
-str_reject <- function(string, pattern) {
-  string[!stringr::str_detect(string, pattern)]
+  if (direction == "forward") {
+    col_names
+  } else {
+    rev(col_names)
+  }
 }
 
 
