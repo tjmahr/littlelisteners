@@ -13,38 +13,90 @@
 #'   interpolated. Only spans of missing data with less than or equal to this
 #'   duration will be interpolated
 #' @param fps number of eyetracking frames (dataframe rows) per second
-#' @param response_col name of the column with the eyetracking response data
-#' @param interp_col name of a column to add to the dataframe. This column
+#' @param response_col (character) name of the column with the eyetracking response data
+#' @param interp_col (character) name of a column to add to the dataframe. This column
 #'   records whether each frame was interpolated (TRUE) or not (FALSE)
 #' @param fillable values in the response column where interpolation is legal.
 #'   These would typically be AOI locations.
-#' @param missing_looks values that can be imputed
+#' @param missing_looks values that can be imputed.
 #'
 #' @details Use `window` to constrain the duration of missing data windows that
 #'   can be filled. We conventionally use 150ms because we would not expect
 #'   someone to shift their gaze from Image A to Image B to Image A in that
 #'   amount of time.
 #' @export
-interpolate_looks <- function(x, window, fps, response_col, interp_col,
-                                  fillable, missing_looks) {
+#' @examples
+#' # We have time in ms, measured at 60 fps, and
+#' # we want to fill in gaps of 100 ms.
+#' looks <- tibble::tribble(
+#'   ~Subject, ~Trial, ~Time,    ~AOI,         ~Hint,
+#'        "A",      1,  1000,  "Left",     "present",
+#'        "A",      1,  1017,  "Left",     "present",
+#'        "A",      1,  1034,      NA,   "legal gap",
+#'        "A",      1,  1051,      NA,   "legal gap",
+#'        "A",      1,  1068,      NA,   "legal gap",
+#'        "A",      1,  1084,  "Left",     "present",
+#'        "A",      1,  1100,      NA, "illegal gap",
+#'        "A",      2,   983,  "Left",     "present",
+#'        "A",      2,  1000, "Right",     "present",
+#'        "A",      2,  1017,      NA, "illegal gap",
+#'        "A",      2,  1034,      NA, "illegal gap",
+#'        "A",      2,  1051,      NA, "illegal gap",
+#'        "A",      2,  1068,      NA, "illegal gap",
+#'        "A",      2,  1084,      NA, "illegal gap",
+#'        "A",      2,  1100,      NA, "illegal gap",
+#'        "A",      2,  1118,      NA, "illegal gap",
+#'        "A",      2,  1135, "Right",     "present",
+#' )
+#'
+#' # Note that only the "legal gap" rows were interpolated
+#' looks |>
+#'   dplyr::group_by(Trial) |>
+#'   interpolate_looks(
+#'     window = 100,
+#'     fps = 60,
+#'     response_col = "AOI",
+#'     interp_col = "Interpolated",
+#'     fillable = c("Left", "Right"),
+#'     missing_looks = NA
+#'   )
+interpolate_looks <- function(
+    x,
+    window,
+    fps,
+    response_col,
+    interp_col,
+    fillable,
+    missing_looks
+) {
   if (!inherits(x, "grouped_df")) {
     stop("Please use group_by to set grouping columns.\n",
          "  Grouping variables should select a single eyetracking trial.")
   }
-
-   do_(x, ~interpolate_looks_one(
-    x = .,
-    window = window,
-    fps = fps,
-    response_col = response_col,
-    interp_col = interp_col,
-    fillable = fillable,
-    missing_looks = missing_looks))
+  x |>
+    split(~group_indices(x)) |>
+    lapply(
+      interpolate_looks_one,
+      window = window,
+      fps = fps,
+      response_col = response_col,
+      interp_col = interp_col,
+      fillable = fillable,
+      missing_looks = missing_looks
+    ) |>
+    dplyr::bind_rows()
 }
 
 
-interpolate_looks_one <- function(x, window, fps, response_col, interp_col,
-                              fillable, missing_looks) {
+interpolate_looks_one <- function(
+    x,
+    window,
+    fps,
+    response_col,
+    interp_col,
+    fillable,
+    missing_looks
+) {
   is_missing_look <- function(xs) xs %in% missing_looks
   trial <- x
 
@@ -122,3 +174,44 @@ Gap <- function(start, end, na_size) {
     seq = seq(start, end), na_seq = seq(start + 1, end - 1)),
     class = c("Gap", "list"))
 }
+
+#
+#
+# do_process_tobii_file <- function(tobii_file_path, config) {
+#   # Read in the gazedata file
+#   message(basename(tobii_file_path))
+#
+#   gazedata <- littlelisteners::read_gazedata(
+#     gazedata_path = tobii_file_path,
+#     eyes = config$tobii$read_gazedata$eyes,
+#     means_need_both = config$tobii$read_gazedata$means_need_both_eyes,
+#     apply_corrections = config$tobii$read_gazedata$apply_corrections)
+#
+#   # Add AOIs and fill in missing looks
+#   aois <- define_aois(config)
+#   gazes <- gazedata %>%
+#     littlelisteners::add_aois(aois) %>%
+#     group_by_(.dots = config$tobii$aggregations$trial_level) %>%
+#     littlelisteners::interpolate_looks(
+#       window = config$tobii$interpolate_looks$window,
+#       fps = config$tobii$frames_per_sec,
+#       response_col = config$tobii$interpolate_looks$response_col,
+#       interp_col = config$tobii$interpolate_looks$interp_col,
+#       fillable = config$tobii$interpolate_looks$fillable,
+#       missing_looks = config$tobii$interpolate_looks$missing_looks) %>%
+#     ungroup()
+#
+#
+#   interpolate_looks:
+#     window: 235
+#   response_col: "GazeByAOI"
+#   interp_col: "Interpolated"
+#   fillable:
+#     - "ImageL"
+#   - "ImageR"
+#   missing_looks: .na
+#
+#
+#   gazes
+# }
+#
