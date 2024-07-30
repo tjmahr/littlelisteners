@@ -36,6 +36,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="articles/aggregating.html">Aggregating Eyetracking Data</a></li>
+    <li><a class="dropdown-item" href="articles/tobii-example.html">Tobii eyetracking data from scratch</a></li>
   </ul>
 </li>
       </ul>
@@ -43,6 +44,7 @@
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="search.json">
 </form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/r-lib/pkgdown/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
@@ -66,26 +68,20 @@
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"tjmahr/littlelisteners"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="learn-more">Learn more<a class="anchor" aria-label="anchor" href="#learn-more"></a>
+<h2 id="background">Background<a class="anchor" aria-label="anchor" href="#background"></a>
 </h2>
-<p>See the <a href="https://tjmahr.github.io/littlelisteners/" class="external-link">documentation website</a> for package tutorials and documentation.</p>
-<!-- ### Other features -->
-<!-- I've also migrated `empirical_logit` functions from [lookr](https://github.com/tjmahr/lookr). -->
-<!-- ```{r} -->
-<!-- n_to_target <- c(10, 0, 1, 0) -->
-<!-- n_to_distractor <- c(0, 1, 0, 0) -->
-<!-- # undefined log-odds -->
-<!-- log(n_to_target / n_to_distractor) -->
-<!-- # add .5 trick -->
-<!-- log((n_to_target + .5) / (n_to_distractor + .5)) -->
-<!-- # shortcut -->
-<!-- empirical_logit(n_to_target, n_to_distractor) -->
-<!-- # weighting function -->
-<!-- empirical_logit_weight(n_to_target, n_to_distractor) -->
-<!-- ``` -->
+<p>This package was developed to support eyetracking word recognition experiments for the <a href="https://littlelisteners.waisman.wisc.edu/" class="external-link">Little Listeners</a> project. In these experiments, images are placed onscreen and followed by a spoken prompt to view one of the images. We record the participant’s gaze location over the course of a trial. By aggregating this gaze location over many trials, we can describe and measure a participant’s word recognition by showing how their gaze location changes in response to speech.</p>
+<p>littlelisteners is my (Tristan Mahr’s) second or third attempt at making an eyetracking processing package in R. My design goals were to be generic (work on dataframes of eyetracking data) and not just bespoke outputs for individual eyetrackers and experiments. The package’s code tries to play well with the tidyverse as well.</p>
 </div>
 </div>
-  </main><aside class="col-md-3"><div class="license">
+  </main><aside class="col-md-3"><div class="links">
+<h2 data-toc-skip>Links</h2>
+<ul class="list-unstyled">
+<li><a href="https://github.com/r-lib/pkgdown/" class="external-link">Browse source code</a></li>
+</ul>
+</div>
+
+<div class="license">
 <h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
 <li>

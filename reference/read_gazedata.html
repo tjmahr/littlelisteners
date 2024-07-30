@@ -21,9 +21,11 @@ Tobii eyetracker, and performs typical data reduction on that file."></head><bod
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/aggregating.html">Aggregating Eyetracking Data</a></li>
+    <li><a class="dropdown-item" href="../articles/tobii-example.html">Tobii eyetracking data from scratch</a></li>
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/r-lib/pkgdown/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul></div>
 
 
@@ -117,6 +119,28 @@ gazedata (when <code>apply_corrections</code> is TRUE).</p>
   Description &amp; User Guide</a></p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">gazedata_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="example_files.html">example_files</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="fu">read_gazedata</span><span class="op">(</span><span class="va">gazedata_path</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 12,573 × 17</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    Basename TrialNo TobiiTime  Time Origin XLeft XRight XMean YLeft YRight YMean</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> Coartic…       1   1.36<span style="color: #949494;">e</span>12 <span style="text-decoration: underline;">37</span>312 Lower… 0.355  0.367 0.361 0.561  0.551 0.556</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> Coartic…       1   1.36<span style="color: #949494;">e</span>12 <span style="text-decoration: underline;">37</span>329 Lower… 0.352  0.372 0.362 0.559  0.562 0.561</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> Coartic…       1   1.36<span style="color: #949494;">e</span>12 <span style="text-decoration: underline;">37</span>345 Lower… 0.359  0.366 0.362 0.564  0.566 0.565</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> Coartic…       1   1.36<span style="color: #949494;">e</span>12 <span style="text-decoration: underline;">37</span>362 Lower… 0.353  0.366 0.360 0.565  0.573 0.569</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> Coartic…       1   1.36<span style="color: #949494;">e</span>12 <span style="text-decoration: underline;">37</span>378 Lower… 0.350  0.367 0.359 0.558  0.579 0.568</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> Coartic…       1   1.36<span style="color: #949494;">e</span>12 <span style="text-decoration: underline;">37</span>395 Lower… 0.352  0.363 0.358 0.559  0.574 0.567</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> Coartic…       1   1.36<span style="color: #949494;">e</span>12 <span style="text-decoration: underline;">37</span>412 Lower… 0.357  0.360 0.358 0.566  0.565 0.565</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> Coartic…       1   1.36<span style="color: #949494;">e</span>12 <span style="text-decoration: underline;">37</span>428 Lower… 0.352  0.367 0.359 0.563  0.559 0.561</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> Coartic…       1   1.36<span style="color: #949494;">e</span>12 <span style="text-decoration: underline;">37</span>445 Lower… 0.348  0.374 0.361 0.554  0.558 0.556</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> Coartic…       1   1.36<span style="color: #949494;">e</span>12 <span style="text-decoration: underline;">37</span>461 Lower… 0.351  0.364 0.357 0.569  0.565 0.567</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 12,563 more rows</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 6 more variables: ZLeft &lt;dbl&gt;, ZRight &lt;dbl&gt;, ZMean &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   DiameterLeft &lt;dbl&gt;, DiameterRight &lt;dbl&gt;, DiameterMean &lt;dbl&gt;</span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 
