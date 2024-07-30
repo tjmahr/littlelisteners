@@ -1,0 +1,48 @@
+---
+task: "Coartic"
+
+notes: >
+  Coartic_WFFArea_2a (March 2013--ongoing).
+
+  The updated coarticulation pilot experiment incorporated "filler" trials
+  and varied Pitch in the carrier phrase. There is just one AudioStim
+  file (2190 ms), with the following parts:
+  1. Carrier word (find): 780 ms, 2. the: 560 ms, 3. Target (ball): 850 ms.
+
+  Target-onset occurs 1340 ms after AudioStim.OnsetTime.
+
+display:
+  type: "Tobii60XL"
+  frames_per_sec: 60.0
+  width_pix: 1920
+  height_pix: 1200
+  pixels_per_mm: 3.71
+
+aois:
+  comment: >
+    Describes the location of the onscreen areas of interest (AOIs) with
+    respect to the screen origin. The AOIs are assumed to be rectangles.
+  ImageL:
+    name: "ImageL"
+    x_length: 600
+    y_length: 600
+    x_limits: [100, 700]
+    y_limits: [300, 900]
+    x_origin: left
+    y_origin: bottom
+    units: pixels
+  ImageR:
+    name: "ImageR"
+    x_length: 600
+    y_length: 600
+    x_limits: [1220, 1820]
+    y_limits: [300, 900]
+    x_origin: left
+    y_origin: bottom
+    units: pixels
+
+#
+locations:
+  comment: Names of the Eprime columns that say where each image is
+  target: "TargetImage"
+...

@@ -30,3 +30,5 @@ Roxygen: list(markdown = TRUE)
 Encoding: UTF-8
 URL: http://www.tjmahr.com/littlelisteners/
 Config/Needs/website: rmarkdown
+Suggests: 
+    rprime

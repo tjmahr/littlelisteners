@@ -1,0 +1,241 @@
+---
+title: "Tobii eyetracking data from scratch"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+library(tidyverse)
+
+```
+
+In this example, I am going to produce a plot of proportion of looks to a target 
+image for a block of 
+eyetracking data, more or less, from scratch. The experiment was performed 
+using Eprime with a Tobii eyetracker running at 60 FPS. The files for this 
+experiment are bundled with this package and can be located with 
+`example_files()`.
+
+```{r setup}
+library(tidyverse)
+library(littlelisteners)
+paths_to_block1 <- example_files(2)
+basename(paths_to_block1)
+```
+
+Where 
+
+- the `.gazedata` file contains frame-by-frame eyetracking data. 
+- the `.txt` filecontains Eprime's trial-by-trial log of experiment data.
+- the `.yaml` file is a hand-created file with metadata about the experiment.
+
+## Reading in data
+
+The experiment is a two-image looking-while-listening design. The yaml file
+includes the locations of the experiment's areas of interest (AOIs) and the 
+names of some pertinent fields to pull from the Eprime file.
+
+```{r}
+data_yaml <- yaml::read_yaml(paths_to_block1[3])
+str(data_yaml)
+
+data_yaml$notes |> 
+  strwrap(70) |> 
+  writeLines()
+```
+
+This yaml file is useful because it prevents me from having to some numbers.
+
+The Eprime file format is a headache, but I made the rprime package to help 
+clean wrangle them. It was my first R package so the function names are kind of 
+clunky.
+
+```{r}
+# install.packages("rprime")
+data_trial_all <- rprime::read_eprime(paths_to_block1[2]) |> 
+  rprime::FrameList() |> 
+  rprime::filter_in("Eprime.Level", 3) |> 
+  rprime::to_data_frame() |> 
+  tibble::as_tibble()
+data_trial_all
+```
+
+That has a lot of information. We can get to the core of the 
+experiment's trial data:
+
+```{r}
+data_trial <- data_trial_all |> 
+  rename_with(
+    function(x) stringr::str_replace(x, ".OnsetTime", "Onset")
+  ) |> 
+  rename(CarrierOnset = TargetOnset) |> 
+  mutate(
+    across(c(ends_with("Onset"), AudioDur), as.numeric),
+    TargetOnset = as.numeric(CarrierOnset) + 1340,
+    TrialNo = Eprime.LevelName |> 
+      stringr::str_extract("\\d+$") |> 
+      as.numeric()
+  ) |> 
+  select(
+    Basename = Eprime.Basename,
+    TrialNo,
+    Condition = StimType,
+    WordGroup,
+    TargetWord, 
+    Target,
+    AudioDur,
+    Image2secOnset, 
+    FixationOnset, 
+    CarrierOnset, 
+    TargetOnset, 
+    Wait1SecFirstOnset, 
+    AttentionOnset
+  ) 
+data_trial |> 
+  glimpse()
+```
+
+Finally, we have the actual eyetracking data. `read_gazedata()` reads the .gazedata file into R as a tibble, applies some 
+adjustments based on Tobii's validity coding system, blanks out invalid gaze 
+locations, flips the *y* measurements so the origin is the lower-left corner 
+of the screen, and computes monocular means of eyetracking measurements.
+
+```{r}
+data <- read_gazedata(paths_to_block1[1])
+glimpse(data)
+```
+
+Note that the gaze locations are written in terms of screen proportions, not 
+pixels where 0 is a bottom or left edge and 1 is a top or right edge.
+
+## Combining looking data and trial data
+
+The `Basename` and `TrialNo` columns allow us to combine two dataframes.
+
+```{r}
+data <- data |> 
+  left_join(data_trial, by = c("Basename", "TrialNo"))
+```
+
+Now, we do a flurry of things. First, we define areas of interest and map looks to the AOIs.
+
+```{r}
+aois <- list(
+  create_aoi(
+    aoi_name = data_yaml$aois$ImageL$name,
+    x_pix = data_yaml$aois$ImageL$x_limits, 
+    y_pix = data_yaml$aois$ImageL$y_limits,
+    screen_width = data_yaml$display$width_pix,
+    screen_height = data_yaml$display$height_pix
+  ),
+  create_aoi(
+    aoi_name = data_yaml$aois$ImageR$name,
+    x_pix = data_yaml$aois$ImageR$x_limits, 
+    y_pix = data_yaml$aois$ImageR$y_limits,
+    screen_width = data_yaml$display$width_pix,
+    screen_height = data_yaml$display$height_pix
+  )
+)
+```
+
+`add_aois()` maps from screen proportions to AOI locations. This function could
+use some work. It assumes that the looks are stored in `XMean` and `YMean`
+columns and creates a `GazeByAOI` column. It marks any onscreen look outside of
+an AOI as `"tracked"`.
+
+```{r, fig.height=5, fig.asp=1200/1920}
+data <- data |> 
+  add_aois(aois = aois, default_onscreen = "tracked")
+
+ggplot(data) + 
+  aes(x = XMean, y = YMean) + 
+  geom_point(aes(color = GazeByAOI)) +
+  coord_fixed(1200 / 1920)
+```
+
+We can interpolate missing looks to remove blinks or other short gaps in the
+data. This will just fill in the `response_col` values and not the gaze
+locations.
+
+```{r}
+data <- data |> 
+  group_by(Basename, TrialNo) |> 
+  interpolate_looks(
+    window = 150, 
+    fps = 60, 
+    response_col = "GazeByAOI", 
+    interp_col = "WasInterpolated", 
+    fillable = c("ImageL", "ImageR"), 
+    missing_looks = NA
+  ) |> 
+  ungroup()
+```
+
+Here is what we recovered:
+
+```{r}
+data |> 
+  count(GazeByAOI, WasInterpolated)
+```
+
+Now we map the left/right image locations `GazeByAOI` to the experimental roles
+of the images `GazeByImageAOI` in each trial. The least clever way to do this is
+a table join.
+
+```{r}
+aoi_mapping <- tibble::tribble(
+  ~GazeByAOI, ~Target, ~GazeByImageAOI,
+  "ImageL",  "ImageL", "Target",
+  "ImageL",  "ImageR", "Distractor",
+  "ImageR",  "ImageR", "Target",
+  "ImageR",  "ImageL", "Distractor",
+  "tracked", "ImageL", "tracked",
+  "tracked", "ImageR", "tracked",
+  NA,  "ImageL", NA,
+  NA, "ImageR", NA
+)
+
+data <- data |> 
+  left_join(aoi_mapping, by = c("Target", "GazeByAOI"))
+```
+
+The final step for preprocessing is to align the trials so that time = 0 is the 
+target onset. This function should just work on grouped dataframe *sigh* instead 
+of including them haphazardly.
+
+```{r}
+data <- data |> 
+  adjust_times(
+    time_var = Time, event_var = TargetOnset, 
+    # grouping variables
+    Basename, TrialNo
+  )
+```
+
+## Aggregating data
+
+At each frame, we can count the proportion of looks to the target. First, we 
+need create a *response definition* which tells little listeners how to treat 
+the labels in terms of targets and competitors.
+
+```{r}
+def <- create_response_def(
+  primary = "Target", 
+  others = "Distractor", 
+  elsewhere = "tracked"
+)
+
+data_agg <- data |> 
+  filter(-2000 < Time, Time < 2000) |> 
+  aggregate_looks(def, Condition + Time ~ GazeByImageAOI)
+
+ggplot(data_agg) + 
+  aes(x = Time, y = Prop) +
+  geom_line(aes(color = Condition))
+
+```
+
+From here, we might combine multiple blocks of trials for this participant 
+together and downsample the data into 50 ms to get a less jumpy line.

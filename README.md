@@ -22,23 +22,19 @@ install.packages("devtools")
 devtools::install_github("tjmahr/littlelisteners")
 ```
 
-## Learn more
+## Background
 
-See the [documentation
-website](https://tjmahr.github.io/littlelisteners/) for package
-tutorials and documentation.
+This package was developed to support eyetracking word recognition
+experiments for the [Little
+Listeners](https://littlelisteners.waisman.wisc.edu/) project. In these
+experiments, images are placed onscreen and followed by a spoken prompt
+to view one of the images. We record the participant’s gaze location
+over the course of a trial. By aggregating this gaze location over many
+trials, we can describe and measure a participant’s word recognition by
+showing how their gaze location changes in response to speech.
 
-<!-- ### Other features -->
-<!-- I've also migrated `empirical_logit` functions from [lookr](https://github.com/tjmahr/lookr). -->
-<!-- ```{r} -->
-<!-- n_to_target <- c(10, 0, 1, 0) -->
-<!-- n_to_distractor <- c(0, 1, 0, 0) -->
-<!-- # undefined log-odds -->
-<!-- log(n_to_target / n_to_distractor) -->
-<!-- # add .5 trick -->
-<!-- log((n_to_target + .5) / (n_to_distractor + .5)) -->
-<!-- # shortcut -->
-<!-- empirical_logit(n_to_target, n_to_distractor) -->
-<!-- # weighting function -->
-<!-- empirical_logit_weight(n_to_target, n_to_distractor) -->
-<!-- ``` -->
+littlelisteners is my (Tristan Mahr’s) second or third attempt at making
+an eyetracking processing package in R. My design goals were to be
+generic (work on dataframes of eyetracking data) and not just bespoke
+outputs for individual eyetrackers and experiments. The package’s code
+tries to play well with the tidyverse as well.

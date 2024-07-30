@@ -68,6 +68,10 @@ gazedata (when \code{apply_corrections} is TRUE).
   pair \code{(XLeft = NA, XRight = .5)} yields \code{XMean = .5}.
 }
 }
+\examples{
+gazedata_path <- example_files(1)[1]
+read_gazedata(gazedata_path)
+}
 \references{
 \href{http://bit.ly/1AtKyhR}{Tobii Toolbox for Matlab: Product
   Description & User Guide}

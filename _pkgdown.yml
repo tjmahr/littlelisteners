@@ -1,4 +1,7 @@
 url: http://www.tjmahr.com/littlelisteners/
+repo:
+  url:
+    home: https://github.com/r-lib/pkgdown/
 template:
   bootstrap: 5
   bootswatch: cerulean
@@ -33,6 +36,7 @@ reference:
       Example datasets
     contents:
       - four_image_data
+      - example_files
   - title: "Little Listeners project"
     desc: >
       These functions apply only to data collected for the

@@ -1,9 +1,9 @@
+
+
 test_that("reading gazedata files", {
-  gazedata_path <- test_path(    "data", "example-tobii-data", "Coartic_Block1_001P00XS1.gazedata"
-)
-  d <- test_path(
-    "data", "example-tobii-data", "Coartic_Block1_001P00XS1.gazedata"
-  ) |>
+  gazedata_path <- example_files(1)[1]
+
+  d <- gazedata_path |>
     read_gazedata()
 
   xs <- c(d$XLeft, d$XRight, d$XMean)

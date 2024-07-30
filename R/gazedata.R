@@ -53,6 +53,9 @@
 #'   Description & User Guide}
 #' @export
 #' @noMd
+#' @examples
+#' gazedata_path <- example_files(1)[1]
+#' read_gazedata(gazedata_path)
 read_gazedata <- function(
     gazedata_path,
     eyes = "both",
